@@ -10,6 +10,8 @@ class Router {
             $path = $path . '/';
         }
 
+        $path = '/papi/api/' . $path;
+
         array_push($this->routes, [
             'path' => $path,
             'method' => $method,
@@ -33,7 +35,7 @@ class Router {
 
 $router = new Router();
 
-$router->add('POST', '/api/api/test', [UserController::class, 'createUser']);
+$router->add('POST', 'create_user', [UserController::class, 'create']);
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
