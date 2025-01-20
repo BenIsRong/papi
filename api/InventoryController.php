@@ -25,7 +25,26 @@ class InventoryController extends Controller{
     }
 
     public function read(){
+        if($this->checkToken()){
+            $result = $this->view("inventories", [
+                [
+                    "col" => "name",
+                    "operator" => "=",
+                    "value" => "Test One",
+                ],
+                [
+                    "col" => "price",
+                    "operator" => "<",
+                    "value" => 20,
+                ],
+            ]);
 
+            if($result){
+                $this->response(200, ["message" => "retrieved inventories", "data" => $result]);
+            }else{
+                $this->response(422, ["message" => "unable to retrieve inventory"]);
+            }
+        }
     }
 
     public function index(){
@@ -65,7 +84,11 @@ class InventoryController extends Controller{
                 "stock" => $params['stock'],
                 "sold" => $params['sold'],
             ], [
-                "id" => $params['id'],
+                [
+                    "col" => "id",
+                    "operator" => "=",
+                    "value" => $params['id'],
+                ],
             ]);
 
             if($result){
@@ -85,7 +108,11 @@ class InventoryController extends Controller{
             if(array_key_exists("query", $parsed_url)){
                 parse_str($parsed_url["query"], $params);
                 $result = $this->deleteFrom("inventories", [
-                    "id" => $params['id'],
+                    [
+                        "col" => "id",
+                        "operator" => "=",
+                        "value" => $params['id'],
+                    ],
                 ]);
 
                 if($result){

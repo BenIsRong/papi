@@ -27,6 +27,22 @@ class Controller {
         $conn->close();
     }
 
+    public function view(string $table, array $conditions=[]){
+        $conn = $this->connectDatabase();
+        $res = [];
+        $conditionString = $this->generateConditionString($conditions);
+
+        $query = "SELECT * FROM $table WHERE " . $conditionString;
+        $result = $conn->query($query);
+
+        while($row = $result->fetch_assoc()){
+            array_push($res, $row);
+        }
+
+        return $res;
+        $conn->close();
+    }
+
     public function insertInto(string $table, array $data){
         $conn = $this->connectDatabase();
         $data_keys = array_keys($data);
@@ -59,7 +75,7 @@ class Controller {
         $conn = $this->connectDatabase();
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
 
-        $query = "UPDATE `$table` SET " . implode(", ", $data) . " WHERE " . (count($conditions) > 1 ? implode(" AND ", $conditions) : $conditions[0]);
+        $query = "UPDATE `$table` SET " . implode(", ", $data) . " WHERE " . $conditions;
         
         $result = $conn->query($query);
         $conn->close();
@@ -72,21 +88,15 @@ class Controller {
         $where = [];
 
         if(count($conditions) != 0){
-            foreach($conditions as $key=>$value){
-                if(! is_numeric($value)){
-                    array_push($where, "`$key`='$value'");
-                }else{
-                    array_push($where, "`$key`=$value");
-                }
-            }
+            $where = $this->generateConditionString($conditions);
         }else{
             return false;
         }
 
-        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE " . (count($where) > 1 ? implode(" AND ", $where) : $where[0]))->fetch_assoc();
+        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE " . $where)->fetch_assoc();
 
         if($select["num"] > 0){
-            $query = "DELETE FROM `$table` WHERE " . (count($where) > 1 ? implode(" AND ", $conditions) : $where[0]);
+            $query = "DELETE FROM `$table` WHERE " . $where;
             $result = $conn->query($query);
             $conn->close();
             return $result;
@@ -111,12 +121,28 @@ class Controller {
         }
     }
 
-    public function response(int $responseCode, ?array $res = []){
+    public function response(int $responseCode, array $res = []){
         http_response_code($responseCode);
         echo json_encode($res);
     }
 
-    private function dataToValues(array $data, ?array $conditions=[], bool $update=false){
+    private function generateConditionString(array $conditions){
+        $conditionStrings = [];
+
+        foreach($conditions as $condition){
+            if(! is_numeric($condition['value'])){
+                $conditionString = $condition['col'] . $condition['operator'] . "'" . $condition['value'] . "'";
+                array_push($conditionStrings, $conditionString);
+            }else{
+                $conditionString = $condition['col'] . $condition['operator'] . $condition['value'];
+                array_push($conditionStrings, $conditionString);
+            }
+        }
+
+        return implode(" AND ", $conditionStrings);
+    }
+
+    private function dataToValues(array $data, array $conditions=[], bool $update=false){
         if(! $update){
             $vals = [];
             if(! array_is_list($data)){
@@ -133,7 +159,7 @@ class Controller {
             return $vals;
         }else{
             $vals = [];
-            $where = [];
+            $where = "";
             foreach($data as $key=>$value){
                 if(! is_numeric($value)){
                     array_push($vals, "`$key`='$value'");
@@ -143,15 +169,9 @@ class Controller {
             }
 
             if(count($conditions) != 0){
-                foreach($conditions as $key=>$value){
-                    if(! is_numeric($value)){
-                        array_push($where, "`$key`='$value'");
-                    }else{
-                        array_push($where, "`$key`=$value");
-                    }
-                }
+                $where = $this->generateConditionString($conditions);
             }else{
-                array_push($where, 1);
+                $where = "1";
             }
 
             return [$vals, $where];
