@@ -63,6 +63,18 @@ class Controller
         return $result['num'];
     }
 
+    public function ends(string $table, string $column, array $conditions = [], string $type="max")
+    {
+        $conn = $this->connectDatabase();
+        $conditionString = $this->generateConditionString($conditions);
+
+        $query = 'SELECT '. strtoupper($type) .'('.$column.") as $type FROM $table WHERE ".$conditionString;
+        $result = $conn->query($query)->fetch_assoc();
+        $conn->close();
+
+        return $result[$type];
+    }
+
     public function insertInto(string $table, array $data)
     {
         $conn = $this->connectDatabase();
