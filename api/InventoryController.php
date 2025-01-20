@@ -24,6 +24,29 @@ class InventoryController extends Controller{
         }
     }
 
+    public function createMultiple(){
+        if($this->checkToken()){
+            $inventories = $_POST['inventories'];
+            $keys = [];
+            $data = [];
+            foreach($inventories as $inventory){
+                $keys = $keys + array_keys($inventory);
+                array_push($data, array_values($inventory));
+            }
+            $keys = array_unique($keys);
+
+            $result = $this->insertMultiple("inventories", $keys, $data);
+
+            if($result){
+                $this->response(201, ["message" => "created inventories successfully"]);
+            }else{
+                $this->response(422, ["message" => "unable to create inventories"]);
+            }
+        }else{
+            $this->response(404);
+        }
+    }
+
     public function update(){
         if($this->checkToken()){
             parse_str(parse_url($_SERVER["REQUEST_URI"])["query"], $params);

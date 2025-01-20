@@ -39,6 +39,7 @@ $router = new Router();
 
 $router->add('POST', 'user', [UserController::class, 'create']);
 $router->add('POST', 'inventory', [InventoryController::class, 'create']);
+$router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
 $router->add('PUT', 'inventory', [InventoryController::class, 'update']);
 $router->add('DELETE', 'inventory', [InventoryController::class, 'delete']);
 

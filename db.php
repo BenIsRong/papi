@@ -40,6 +40,21 @@ class Controller {
         return $result;
     }
 
+    public function insertMultiple(string $table, array $columns, array $datas){
+        $conn = $this->connectDatabase();
+        $query = "INSERT INTO $table (" . implode(", ", $columns) . ") VALUES ";
+        foreach($datas as $data){
+            $query = $query . "(" . implode(", ", $this->dataToValues($data)) . "),";
+        }
+
+        $query = rtrim($query, ",");
+
+        $result = $conn->query($query);
+        $conn->close();
+
+        return $result;
+    }
+
     public function updateInto(string $table, array $data, array $conditions=[]){
         $conn = $this->connectDatabase();
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
@@ -83,7 +98,7 @@ class Controller {
 
     public function deleteAll(string $table){
         $conn = $this->connectDatabase();
-                
+
         $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
 
         if($select["num"] > 0){
