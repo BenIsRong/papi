@@ -38,7 +38,7 @@ class Controller
         $res = [];
         $conditionString = $this->generateConditionString($conditions);
 
-        $query = "SELECT * FROM $table WHERE ".$conditionString;
+        $query = 'SELECT * FROM $table WHERE '.$conditionString;
         $result = $conn->query($query);
         $conn->close();
 
@@ -49,13 +49,27 @@ class Controller
         return $res;
     }
 
+    public function count(string $table, array $columns = [], array $conditions = [])
+    {
+        $conn = $this->connectDatabase();
+        $conditionString = $this->generateConditionString($conditions);
+        $columns = count($columns) > 0 ? implode(', ', $columns) : '*';
+
+        $query = 'SELECT COUNT('.$columns.') AS num FROM $table WHERE '.$conditionString;
+
+        $result = $conn->query($query)->fetch_assoc();
+        $conn->close();
+
+        return $result['num'];
+    }
+
     public function insertInto(string $table, array $data)
     {
         $conn = $this->connectDatabase();
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
-        $query = "INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.implode(', ', $data_values).')';
+        $query = 'INSERT INTO $table ('.implode(', ', $data_keys).') VALUES ('.implode(', ', $data_values).')';
 
         $result = $conn->query($query);
         $conn->close();
@@ -85,7 +99,7 @@ class Controller
         $conn = $this->connectDatabase();
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
 
-        $query = "UPDATE `$table` SET ".implode(', ', $data).' WHERE '.$conditions;
+        $query = 'UPDATE `$table` SET '.implode(', ', $data).' WHERE '.$conditions;
 
         $result = $conn->query($query);
         $conn->close();
@@ -106,7 +120,7 @@ class Controller
             return false;
         }
 
-        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE ".$where)->fetch_assoc();
+        $select = $conn->query('SELECT COUNT(*) as num FROM $table WHERE '.$where)->fetch_assoc();
 
         if ($select['num'] > 0) {
             $query = "DELETE FROM `$table` WHERE ".$where;
@@ -126,7 +140,7 @@ class Controller
     {
         $conn = $this->connectDatabase();
 
-        $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
+        $select = $conn->query('SELECT COUNT(*) as num FROM $table')->fetch_assoc();
 
         if ($select['num'] > 0) {
             $query = "DELETE FROM `$table` WHERE 1";
