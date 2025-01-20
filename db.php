@@ -1,12 +1,9 @@
 <?php
 class Controller {
     public function connectDatabase(){
-        $host = "localhost";
-        $username = "root";
-        $password = "";
-        $db = "api";
+        $env = parse_ini_file(".env");
         
-        $conn = new mysqli($host, $username, $password, $db);
+        $conn = new mysqli($env["DB_HOST"], $env["DB_USERNAME"], $env["DB_PASSWORD"], $env["DB_NAME"]);
         
         if($conn->connect_error){
             die("Connection failed: ".$conn->connect_error);
