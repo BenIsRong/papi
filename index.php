@@ -1,6 +1,8 @@
 <?php
 include('./api/UserController.php');
+include('./api/InventoryController.php');
 use UserController as UserController;
+use InventoryController as InventoryController;
 
 class Router {
     private array $routes = [];
@@ -35,7 +37,8 @@ class Router {
 
 $router = new Router();
 
-$router->add('POST', 'create_user', [UserController::class, 'create']);
+$router->add('POST', 'user', [UserController::class, 'create']);
+$router->add('POST', 'inventory', [InventoryController::class, 'create']);
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
