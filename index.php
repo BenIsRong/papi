@@ -33,15 +33,35 @@ class Router {
             }
         }
     }
+
+    public function addCRUD(string $item, string $controller){
+        $cruds = [
+            'create' => 'POST',
+            'read' => 'GET',
+            'index' => 'GET',
+            'update' => 'PUT',
+            'delete' => 'DELETE',
+        ];
+
+        foreach($cruds as $crud=>$method){
+
+            $path = '/papi/api/' . $item;
+    
+            array_push($this->routes, [
+                'path' => $path,
+                'method' => $method,
+                'controller' => [$controller, $crud],
+            ]);
+        }
+    }
+
 }
 
 $router = new Router();
 
 $router->add('POST', 'user', [UserController::class, 'create']);
-$router->add('POST', 'inventory', [InventoryController::class, 'create']);
+$router->addCRUD('inventory', InventoryController::class);
 $router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
-$router->add('PUT', 'inventory', [InventoryController::class, 'update']);
-$router->add('DELETE', 'inventory', [InventoryController::class, 'delete']);
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 

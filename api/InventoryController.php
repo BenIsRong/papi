@@ -24,6 +24,14 @@ class InventoryController extends Controller{
         }
     }
 
+    public function read(){
+
+    }
+
+    public function index(){
+        
+    }
+
     public function createMultiple(){
         if($this->checkToken()){
             $inventories = $_POST['inventories'];
