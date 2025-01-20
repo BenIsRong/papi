@@ -73,13 +73,27 @@ class Controller {
         if($select["num"] > 0){
             $query = "DELETE FROM `$table` WHERE " . (count($where) > 1 ? implode(" AND ", $conditions) : $where[0]);
             $result = $conn->query($query);
+            $conn->close();
+            return $result;
         }else{
             return false;
         }
 
-        $conn->close();
+    }
 
-        return $result;
+    public function deleteAll(string $table){
+        $conn = $this->connectDatabase();
+                
+        $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
+
+        if($select["num"] > 0){
+            $query = "DELETE FROM `$table` WHERE 1";
+            $result = $conn->query($query);
+            $conn->close();
+            return $result;
+        }else{
+            return false;
+        }
     }
 
     public function response(int $responseCode, ?array $res = []){

@@ -50,16 +50,28 @@ class InventoryController extends Controller{
 
     public function delete(){        
         if($this->checkToken()){
-            parse_str(parse_url($_SERVER["REQUEST_URI"])["query"], $params);
-            $result = $this->deleteFrom("inventories", [
-                "id" => $params['id'],
-            ]);
+            $parsed_url = parse_url($_SERVER["REQUEST_URI"]);
+            if(array_key_exists("query", $parsed_url)){
+                parse_str($parsed_url["query"], $params);
+                $result = $this->deleteFrom("inventories", [
+                    "id" => $params['id'],
+                ]);
 
-            if($result){
-                $this->response(200, ["message" => "inventory deleted successfully"]);
+                if($result){
+                    $this->response(200, ["message" => "inventory deleted successfully"]);
+                }else{
+                    $this->response(422, ["message" => "unable to delete inventory"]);
+                }
             }else{
-                $this->response(422, ["message" => "unable to delete inventory"]);
+                $result = $this->deleteAll("inventories");
+
+                if($result){
+                    $this->response(200, ["message" => "inventories deleted successfully"]);
+                }else{
+                    $this->response(422, ["message" => "unable to delete inventories"]);
+                }
             }
+            
 
         }else{
             $this->response(404);
