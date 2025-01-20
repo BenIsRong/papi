@@ -50,7 +50,18 @@ class InventoryController extends Controller
         }
     }
 
-    public function index() {}
+    public function index()
+    {
+        if ($this->checkToken()) {
+            $result = $this->view('inventories');
+
+            if ($result) {
+                $this->response(200, ['message' => 'retrieved inventories', 'data' => $result]);
+            } else {
+                $this->response(422, ['message' => 'unable to retrieve inventory']);
+            }
+        }
+    }
 
     public function createMultiple()
     {

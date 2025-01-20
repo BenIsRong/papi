@@ -49,11 +49,10 @@ class Router
         ];
 
         foreach ($cruds as $crud => $method) {
-
             $path = '/papi/api/'.$item;
 
             array_push($this->routes, [
-                'path' => $path.'/',
+                'path' => $crud == 'index' ? $path.'/all/' : $path.'/',
                 'method' => $method,
                 'controller' => [$controller, $crud],
             ]);

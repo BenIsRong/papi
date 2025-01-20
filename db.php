@@ -147,19 +147,23 @@ class Controller
 
     private function generateConditionString(array $conditions)
     {
-        $conditionStrings = [];
+        if (count($conditions) > 0) {
+            $conditionStrings = [];
 
-        foreach ($conditions as $condition) {
-            if (! is_numeric($condition['value'])) {
-                $conditionString = $condition['col'].$condition['operator']."'".$condition['value']."'";
-                array_push($conditionStrings, $conditionString);
-            } else {
-                $conditionString = $condition['col'].$condition['operator'].$condition['value'];
-                array_push($conditionStrings, $conditionString);
+            foreach ($conditions as $condition) {
+                if (! is_numeric($condition['value'])) {
+                    $conditionString = $condition['col'].$condition['operator']."'".$condition['value']."'";
+                    array_push($conditionStrings, $conditionString);
+                } else {
+                    $conditionString = $condition['col'].$condition['operator'].$condition['value'];
+                    array_push($conditionStrings, $conditionString);
+                }
             }
-        }
 
-        return implode(' AND ', $conditionStrings);
+            return implode(' AND ', $conditionStrings);
+        } else {
+            return '1';
+        }
     }
 
     private function dataToValues(array $data, array $conditions = [], bool $update = false)
