@@ -1,69 +1,76 @@
 <?php
-class Controller {
-    public function connectDatabase(){
-        $env = parse_ini_file(".env");
-        
-        $conn = new mysqli($env["DB_HOST"], $env["DB_USERNAME"], $env["DB_PASSWORD"], $env["DB_NAME"]);
-        
-        if($conn->connect_error){
-            die("Connection failed: ".$conn->connect_error);
+
+class Controller
+{
+    public function connectDatabase()
+    {
+        $env = parse_ini_file('.env');
+
+        $conn = new mysqli($env['DB_HOST'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
+
+        if ($conn->connect_error) {
+            exit('Connection failed: '.$conn->connect_error);
         }
 
         return $conn;
     }
 
-    public function checkToken(){
+    public function checkToken()
+    {
         $conn = $this->connectDatabase();
         $headers = apache_request_headers();
-        $token = explode(" ", $headers['Authorization']);
+        $token = explode(' ', $headers['Authorization']);
         $token = end($token);
 
         $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
-        if($result['num'] > 0){
+        $conn->close();
+        if ($result['num'] > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
-        $conn->close();
     }
 
-    public function view(string $table, array $conditions=[]){
+    public function view(string $table, array $conditions = [])
+    {
         $conn = $this->connectDatabase();
         $res = [];
         $conditionString = $this->generateConditionString($conditions);
 
-        $query = "SELECT * FROM $table WHERE " . $conditionString;
+        $query = "SELECT * FROM $table WHERE ".$conditionString;
         $result = $conn->query($query);
+        $conn->close();
 
-        while($row = $result->fetch_assoc()){
+        while ($row = $result->fetch_assoc()) {
             array_push($res, $row);
         }
 
         return $res;
-        $conn->close();
     }
 
-    public function insertInto(string $table, array $data){
+    public function insertInto(string $table, array $data)
+    {
         $conn = $this->connectDatabase();
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
-        $query = "INSERT INTO $table (" . implode(", ", $data_keys) . ") VALUES (" . implode(", ", $data_values) . ")";
-        
+        $query = "INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.implode(', ', $data_values).')';
+
         $result = $conn->query($query);
         $conn->close();
 
         return $result;
     }
 
-    public function insertMultiple(string $table, array $columns, array $datas){
+    public function insertMultiple(string $table, array $columns, array $datas)
+    {
         $conn = $this->connectDatabase();
-        $query = "INSERT INTO $table (" . implode(", ", $columns) . ") VALUES ";
-        foreach($datas as $data){
-            $query = $query . "(" . implode(", ", $this->dataToValues($data)) . "),";
+        $query = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
+        foreach ($datas as $data) {
+            $query = $query.'('.implode(', ', $this->dataToValues($data)).'),';
         }
 
-        $query = rtrim($query, ",");
+        $query = rtrim($query, ',');
 
         $result = $conn->query($query);
         $conn->close();
@@ -71,107 +78,122 @@ class Controller {
         return $result;
     }
 
-    public function updateInto(string $table, array $data, array $conditions=[]){
+    public function updateInto(string $table, array $data, array $conditions = [])
+    {
         $conn = $this->connectDatabase();
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
 
-        $query = "UPDATE `$table` SET " . implode(", ", $data) . " WHERE " . $conditions;
-        
+        $query = "UPDATE `$table` SET ".implode(', ', $data).' WHERE '.$conditions;
+
         $result = $conn->query($query);
         $conn->close();
 
         return $result;
     }
 
-    public function deleteFrom(string $table, array $conditions=[]){
+    public function deleteFrom(string $table, array $conditions = [])
+    {
         $conn = $this->connectDatabase();
         $where = [];
 
-        if(count($conditions) != 0){
+        if (count($conditions) != 0) {
             $where = $this->generateConditionString($conditions);
-        }else{
+        } else {
+            $conn->close();
+
             return false;
         }
 
-        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE " . $where)->fetch_assoc();
+        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE ".$where)->fetch_assoc();
 
-        if($select["num"] > 0){
-            $query = "DELETE FROM `$table` WHERE " . $where;
+        if ($select['num'] > 0) {
+            $query = "DELETE FROM `$table` WHERE ".$where;
             $result = $conn->query($query);
             $conn->close();
+
             return $result;
-        }else{
+        } else {
+            $conn->close();
+
             return false;
         }
 
     }
 
-    public function deleteAll(string $table){
+    public function deleteAll(string $table)
+    {
         $conn = $this->connectDatabase();
 
         $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
 
-        if($select["num"] > 0){
+        if ($select['num'] > 0) {
             $query = "DELETE FROM `$table` WHERE 1";
             $result = $conn->query($query);
             $conn->close();
+
             return $result;
-        }else{
+        } else {
+            $conn->close();
+
             return false;
         }
     }
 
-    public function response(int $responseCode, array $res = []){
+    public function response(int $responseCode, array $res = [])
+    {
         http_response_code($responseCode);
         echo json_encode($res);
     }
 
-    private function generateConditionString(array $conditions){
+    private function generateConditionString(array $conditions)
+    {
         $conditionStrings = [];
 
-        foreach($conditions as $condition){
-            if(! is_numeric($condition['value'])){
-                $conditionString = $condition['col'] . $condition['operator'] . "'" . $condition['value'] . "'";
+        foreach ($conditions as $condition) {
+            if (! is_numeric($condition['value'])) {
+                $conditionString = $condition['col'].$condition['operator']."'".$condition['value']."'";
                 array_push($conditionStrings, $conditionString);
-            }else{
-                $conditionString = $condition['col'] . $condition['operator'] . $condition['value'];
+            } else {
+                $conditionString = $condition['col'].$condition['operator'].$condition['value'];
                 array_push($conditionStrings, $conditionString);
             }
         }
 
-        return implode(" AND ", $conditionStrings);
+        return implode(' AND ', $conditionStrings);
     }
 
-    private function dataToValues(array $data, array $conditions=[], bool $update=false){
-        if(! $update){
+    private function dataToValues(array $data, array $conditions = [], bool $update = false)
+    {
+        if (! $update) {
             $vals = [];
-            if(! array_is_list($data)){
+            if (! array_is_list($data)) {
                 $data = array_values($data);
             }
-    
-            foreach($data as $value){
-                if(! is_numeric($value)){
+
+            foreach ($data as $value) {
+                if (! is_numeric($value)) {
                     array_push($vals, "'$value'");
-                }else{
+                } else {
                     array_push($vals, $value);
                 }
             }
+
             return $vals;
-        }else{
+        } else {
             $vals = [];
-            $where = "";
-            foreach($data as $key=>$value){
-                if(! is_numeric($value)){
+            $where = '';
+            foreach ($data as $key => $value) {
+                if (! is_numeric($value)) {
                     array_push($vals, "`$key`='$value'");
-                }else{
+                } else {
                     array_push($vals, "`$key`=$value");
                 }
             }
 
-            if(count($conditions) != 0){
+            if (count($conditions) != 0) {
                 $where = $this->generateConditionString($conditions);
-            }else{
-                $where = "1";
+            } else {
+                $where = '1';
             }
 
             return [$vals, $where];

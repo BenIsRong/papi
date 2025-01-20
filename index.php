@@ -1,18 +1,21 @@
 <?php
-include('./api/UserController.php');
-include('./api/InventoryController.php');
-use UserController as UserController;
-use InventoryController as InventoryController;
 
-class Router {
+include './api/UserController.php';
+include './api/InventoryController.php';
+use InventoryController as InventoryController;
+use UserController as UserController;
+
+class Router
+{
     private array $routes = [];
 
-    public function add(string $method, string $path, array $controller){
-        if(substr($path, -1) != '/'){
-            $path = $path . '/';
+    public function add(string $method, string $path, array $controller)
+    {
+        if (substr($path, -1) != '/') {
+            $path = $path.'/';
         }
 
-        $path = '/papi/api/' . $path;
+        $path = '/papi/api/'.$path;
 
         array_push($this->routes, [
             'path' => $path,
@@ -21,12 +24,13 @@ class Router {
         ]);
     }
 
-    public function dispatch(string $path){
-        if(substr($path, -1) != '/'){
-            $path = $path . '/';
+    public function dispatch(string $path)
+    {
+        if (substr($path, -1) != '/') {
+            $path = $path.'/';
         }
-        foreach ($this->routes as $route){
-            if($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])){
+        foreach ($this->routes as $route) {
+            if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                 [$class, $function] = $route['controller'];
                 $controllerInstance = new $class;
                 $controllerInstance->$function();
@@ -34,7 +38,8 @@ class Router {
         }
     }
 
-    public function addCRUD(string $item, string $controller){
+    public function addCRUD(string $item, string $controller)
+    {
         $cruds = [
             'create' => 'POST',
             'read' => 'GET',
@@ -43,27 +48,28 @@ class Router {
             'delete' => 'DELETE',
         ];
 
-        foreach($cruds as $crud=>$method){
+        foreach ($cruds as $crud => $method) {
 
-            $path = '/papi/api/' . $item;
-    
+            $path = '/papi/api/'.$item;
+
             array_push($this->routes, [
-                'path' => $path . '/',
+                'path' => $path.'/',
                 'method' => $method,
                 'controller' => [$controller, $crud],
             ]);
         }
     }
 
-    public function listRoutes(){
-        print('The routes are: ');
-        foreach($this->routes as $route){
-            print('<br />' .  $route['path'] . ' (' . $route['method'] . ')' . ' | ' . $route['controller'][0] . ', ' . $route['controller'][1]);
+    public function listRoutes()
+    {
+        echo 'The routes are: ';
+        foreach ($this->routes as $route) {
+            echo '<br />'.$route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1];
         }
     }
 }
 
-$router = new Router();
+$router = new Router;
 
 $router->add('POST', 'user', [UserController::class, 'create']);
 $router->add('POST', 'user/regenToken', [UserController::class, 'regenerateToken']);
