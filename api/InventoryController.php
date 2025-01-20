@@ -29,7 +29,7 @@ class InventoryController extends Controller{
     }
 
     public function index(){
-        
+
     }
 
     public function createMultiple(){

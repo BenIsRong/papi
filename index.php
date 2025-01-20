@@ -48,18 +48,26 @@ class Router {
             $path = '/papi/api/' . $item;
     
             array_push($this->routes, [
-                'path' => $path,
+                'path' => $path . '/',
                 'method' => $method,
                 'controller' => [$controller, $crud],
             ]);
         }
     }
 
+    public function listRoutes(){
+        print('The routes are: ');
+        foreach($this->routes as $route){
+            print('<br />' .  $route['path'] . ' (' . $route['method'] . ')' . ' | ' . $route['controller'][0] . ', ' . $route['controller'][1]);
+        }
+    }
 }
 
 $router = new Router();
 
 $router->add('POST', 'user', [UserController::class, 'create']);
+$router->add('POST', 'user/regenToken', [UserController::class, 'regenerateToken']);
+
 $router->addCRUD('inventory', InventoryController::class);
 $router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
 
