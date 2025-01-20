@@ -1,8 +1,5 @@
 <?php
 class Controller {
-
-    private $conn;
-
     public function connectDatabase(){
         $host = "localhost";
         $username = "root";
@@ -15,32 +12,46 @@ class Controller {
             die("Connection failed: ".$conn->connect_error);
         }
 
-        $this->conn = $conn;
-
         return $conn;
     }
 
     public function checkToken(){
+        $conn = $this->connectDatabase();
         $headers = apache_request_headers();
         $token = explode(" ", $headers['Authorization']);
         $token = end($token);
 
-        $result = $this->conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
+        $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
         if($result['num'] > 0){
             return true;
         }else{
             return false;
         }
-        $this->conn->close();
+        $conn->close();
     }
 
-    public function insert(string $table, array $data){
+    public function insertInto(string $table, array $data){
+        $conn = $this->connectDatabase();
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
         $query = "INSERT INTO $table (" . implode(", ", $data_keys) . ") VALUES (" . implode(", ", $data_values) . ")";
         
-        $result = $this->conn->query($query);
+        $result = $conn->query($query);
+        $conn->close();
+
+        return $result;
+    }
+
+    public function updateInto(string $table, array $data, array $conditions=[]){
+        $conn = $this->connectDatabase();
+        [$data, $conditions] = $this->dataToValues($data, $conditions, true);
+
+        $query = "UPDATE `$table` SET " . implode(", ", $data) . " WHERE " . (count($conditions) > 1 ? implode(" AND ", $conditions) : $conditions[0]);
+        
+        $result = $conn->query($query);
+        $conn->close();
+
         return $result;
     }
 
@@ -49,21 +60,45 @@ class Controller {
         echo json_encode($res);
     }
 
-    private function dataToValues(array $data){
-        $res = [];
-
-        if(! array_is_list($data)){
-            $data = array_values($data);
-        }
-
-        foreach($data as $value){
-            if(! is_numeric($value)){
-                array_push($res, "'" . $value . "'");
-            }else{
-                array_push($res, $value);
+    private function dataToValues(array $data, ?array $conditions=[], bool $update=false){
+        if(! $update){
+            $vals = [];
+            if(! array_is_list($data)){
+                $data = array_values($data);
             }
-        }
+    
+            foreach($data as $value){
+                if(! is_numeric($value)){
+                    array_push($vals, "'$value'");
+                }else{
+                    array_push($vals, $value);
+                }
+            }
+            return $vals;
+        }else{
+            $vals = [];
+            $where = [];
+            foreach($data as $key=>$value){
+                if(! is_numeric($value)){
+                    array_push($vals, "`$key`='$value'");
+                }else{
+                    array_push($vals, "`$key`=$value");
+                }
+            }
 
-        return $res;
+            if(count($conditions) != 0){
+                foreach($conditions as $key=>$value){
+                    if(! is_numeric($value)){
+                        array_push($where, "`$key`='$value'");
+                    }else{
+                        array_push($where, "`$key`=$value");
+                    }
+                }
+            }else{
+                array_push($where, 1);
+            }
+
+            return [$vals, $where];
+        }
     }
 }

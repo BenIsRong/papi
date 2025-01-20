@@ -39,6 +39,7 @@ $router = new Router();
 
 $router->add('POST', 'user', [UserController::class, 'create']);
 $router->add('POST', 'inventory', [InventoryController::class, 'create']);
+$router->add('PUT', 'inventory', [InventoryController::class, 'update']);
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
