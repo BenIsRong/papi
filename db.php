@@ -55,6 +55,36 @@ class Controller {
         return $result;
     }
 
+    public function deleteFrom(string $table, array $conditions=[]){
+        $conn = $this->connectDatabase();
+        $where = [];
+
+        if(count($conditions) != 0){
+            foreach($conditions as $key=>$value){
+                if(! is_numeric($value)){
+                    array_push($where, "`$key`='$value'");
+                }else{
+                    array_push($where, "`$key`=$value");
+                }
+            }
+        }else{
+            return false;
+        }
+
+        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE " . (count($where) > 1 ? implode(" AND ", $where) : $where[0]))->fetch_assoc();
+
+        if($select["num"] > 0){
+            $query = "DELETE FROM `$table` WHERE " . (count($where) > 1 ? implode(" AND ", $conditions) : $where[0]);
+            $result = $conn->query($query);
+        }else{
+            return false;
+        }
+
+        $conn->close();
+
+        return $result;
+    }
+
     public function response(int $responseCode, ?array $res = []){
         http_response_code($responseCode);
         echo json_encode($res);

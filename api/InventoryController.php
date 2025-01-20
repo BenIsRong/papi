@@ -25,9 +25,8 @@ class InventoryController extends Controller{
     }
 
     public function update(){
-        parse_str(parse_url($_SERVER["REQUEST_URI"])["query"], $params);
-
         if($this->checkToken()){
+            parse_str(parse_url($_SERVER["REQUEST_URI"])["query"], $params);
             $result = $this->updateInto("inventories", [
                 "name" => $params['name'],
                 "cost" => $params['cost'],
@@ -42,6 +41,24 @@ class InventoryController extends Controller{
                 $this->response(200, ["message" => "updated inventory successfully"]);
             }else{
                 $this->response(422, ["message" => "unable to update inventory"]);
+            }
+
+        }else{
+            $this->response(404);
+        }
+    }
+
+    public function delete(){        
+        if($this->checkToken()){
+            parse_str(parse_url($_SERVER["REQUEST_URI"])["query"], $params);
+            $result = $this->deleteFrom("inventories", [
+                "id" => $params['id'],
+            ]);
+
+            if($result){
+                $this->response(200, ["message" => "inventory deleted successfully"]);
+            }else{
+                $this->response(422, ["message" => "unable to delete inventory"]);
             }
 
         }else{
