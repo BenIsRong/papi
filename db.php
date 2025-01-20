@@ -24,6 +24,7 @@ class Controller
 
         $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
         $conn->close();
+
         if ($result['num'] > 0) {
             return true;
         } else {
@@ -66,6 +67,7 @@ class Controller
     {
         $conn = $this->connectDatabase();
         $query = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
+
         foreach ($datas as $data) {
             $query = $query.'('.implode(', ', $this->dataToValues($data)).'),';
         }
@@ -186,6 +188,7 @@ class Controller
         } else {
             $vals = [];
             $where = '';
+
             foreach ($data as $key => $value) {
                 if (! is_numeric($value)) {
                     array_push($vals, "`$key`='$value'");

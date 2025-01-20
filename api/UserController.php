@@ -3,8 +3,6 @@
 include_once './db.php';
 use Controller as Controller;
 
-$method = $_SERVER['REQUEST_METHOD'];
-
 class UserController extends Controller
 {
     public function create()

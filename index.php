@@ -29,6 +29,7 @@ class Router
         if (substr($path, -1) != '/') {
             $path = $path.'/';
         }
+
         foreach ($this->routes as $route) {
             if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                 [$class, $function] = $route['controller'];
@@ -62,6 +63,7 @@ class Router
     public function listRoutes()
     {
         echo 'The routes are: ';
+
         foreach ($this->routes as $route) {
             echo '<br />'.$route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1];
         }
