@@ -53,6 +53,7 @@ class Controller
         while($row = $result->fetch_all()){
             array_push($res, $row);
         }
+        $conn->close();
 
         return $res;
     }
@@ -63,9 +64,11 @@ class Controller
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
-        $query = "INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.implode(', ', $data_values).')';
+        echo "INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.rtrim(str_repeat("?,", count($data_values)), ",").')';
 
-        $result = $conn->query($query);
+        $query = $conn->prepare("INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.rtrim(str_repeat("?,", count($data_values)), ",").')');
+        $query->bind_param($this->generateBindParamTypes($data_values), ...$data_values);
+        $result = $query->execute();
         $conn->close();
 
         return $result;
@@ -156,7 +159,22 @@ class Controller
         echo json_encode($res);
     }
 
-    private function generateConditionString(array $conditions)
+    private function generateBindParamTypes(array $data): string
+    {
+        $types = [];
+        foreach($data as $value){
+            if (! is_numeric($value)) {
+                array_push($types, 's');
+            } else {
+                array_push($types, str_contains($value, '.') ? 'f' : 'i');
+            }
+        }
+
+        return implode("", $types);
+
+    }
+
+    private function generateConditionString(array $conditions): array
     {
         $preparedStatements = [];
         $preparedStatementTypes = [];
@@ -176,7 +194,7 @@ class Controller
                 }
             }
 
-            return [implode(" AND ", $preparedStatements), implode("", $preparedStatementTypes), $conditionStrings];
+            return [implode(" AND ", $preparedStatements), $this->generateBindParamTypes($conditionStrings), $conditionStrings];
         } else {
             return '1';
         }
