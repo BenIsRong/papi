@@ -21,8 +21,12 @@ class Controller
         $headers = apache_request_headers();
         $token = explode(' ', $headers['Authorization']);
         $token = end($token);
+        $token = filter_var($token, FILTER_SANITIZE_SPECIAL_CHARS);
+        $query = $conn->prepare("SELECT COUNT(*) as num FROM tokens WHERE token=?");
+        $query->bind_param("s", $token);
+        $query->execute();
 
-        $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
+        $result = $query->get_result()->fetch_assoc();
         $conn->close();
 
         if ($result['num'] > 0) {
@@ -36,13 +40,17 @@ class Controller
     {
         $conn = $this->connectDatabase();
         $res = [];
-        $conditionString = $this->generateConditionString($conditions);
+        [$conditionString, $types, $conditions] = $this->generateConditionString($conditions);
 
-        $query = "SELECT * FROM $table WHERE ".$conditionString;
-        $result = $conn->query($query);
-        $conn->close();
+        $query = "SELECT * FROM $table WHERE " . $conditionString;
 
-        while ($row = $result->fetch_assoc()) {
+
+        $query = $conn->prepare("SELECT * FROM $table WHERE " . $conditionString);
+        $query->bind_param($types, ...$conditions);
+        $query->execute();
+
+        $result = $query->get_result();
+        while($row = $result->fetch_all()){
             array_push($res, $row);
         }
 
@@ -141,28 +149,34 @@ class Controller
         }
     }
 
-    public function response(int $responseCode, array $res = [])
+    public function response(int $responseCode=500, array $res = [])
     {
         http_response_code($responseCode);
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($res);
     }
 
     private function generateConditionString(array $conditions)
     {
+        $preparedStatements = [];
+        $preparedStatementTypes = [];
         if (count($conditions) > 0) {
             $conditionStrings = [];
 
             foreach ($conditions as $condition) {
+                $preparedStatement = $condition['col'].$condition['operator']."?";
+
+                array_push($preparedStatements, $preparedStatement);
+                array_push($conditionStrings, filter_var($condition['value'], FILTER_SANITIZE_SPECIAL_CHARS));
+                
                 if (! is_numeric($condition['value'])) {
-                    $conditionString = $condition['col'].$condition['operator']."'".$condition['value']."'";
-                    array_push($conditionStrings, $conditionString);
+                    array_push($preparedStatementTypes, 's');
                 } else {
-                    $conditionString = $condition['col'].$condition['operator'].$condition['value'];
-                    array_push($conditionStrings, $conditionString);
+                    array_push($preparedStatementTypes, str_contains($condition['value'], '.') ? 'f' : 'i');
                 }
             }
 
-            return implode(' AND ', $conditionStrings);
+            return [implode(" AND ", $preparedStatements), implode("", $preparedStatementTypes), $conditionStrings];
         } else {
             return '1';
         }
