@@ -22,8 +22,8 @@ class Controller
         $token = explode(' ', $headers['Authorization']);
         $token = end($token);
         $token = filter_var($token, FILTER_SANITIZE_SPECIAL_CHARS);
-        $query = $conn->prepare("SELECT COUNT(*) as num FROM tokens WHERE token=?");
-        $query->bind_param("s", $token);
+        $query = $conn->prepare('SELECT COUNT(*) as num FROM tokens WHERE token=?');
+        $query->bind_param('s', $token);
         $query->execute();
 
         $result = $query->get_result()->fetch_assoc();
@@ -42,15 +42,14 @@ class Controller
         $res = [];
         [$conditionString, $types, $conditions] = $this->generateConditionString($conditions);
 
-        $query = "SELECT * FROM $table WHERE " . $conditionString;
+        $query = "SELECT * FROM $table WHERE ".$conditionString;
 
-
-        $query = $conn->prepare("SELECT * FROM $table WHERE " . $conditionString);
+        $query = $conn->prepare("SELECT * FROM $table WHERE ".$conditionString);
         $query->bind_param($types, ...$conditions);
         $query->execute();
 
         $result = $query->get_result();
-        while($row = $result->fetch_all()){
+        while ($row = $result->fetch_all()) {
             array_push($res, $row);
         }
         $conn->close();
@@ -64,9 +63,9 @@ class Controller
         $dataKeys = array_keys($data);
         $dataValues = $this->dataToValues($data);
 
-        echo "INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat("?,", count($dataValues)), ",").')';
+        echo "INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat('?,', count($dataValues)), ',').')';
 
-        $query = $conn->prepare("INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat("?,", count($dataValues)), ",").')');
+        $query = $conn->prepare("INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat('?,', count($dataValues)), ',').')');
         $query->bind_param($this->generateBindParamTypes($dataValues), ...$dataValues);
         $result = $query->execute();
         $conn->close();
@@ -83,7 +82,7 @@ class Controller
         foreach ($datas as $data) {
             $value = $this->dataToValues($data);
             $values = [...$values, ...$value];
-            $queryString = $queryString . '(' . rtrim(str_repeat('?,', count($value)), ',') . '),';
+            $queryString = $queryString.'('.rtrim(str_repeat('?,', count($value)), ',').'),';
         }
 
         $queryString = rtrim($queryString, ',');
@@ -106,14 +105,14 @@ class Controller
 
         $queryString = "UPDATE `$table` SET ";
 
-        foreach($dataKeys as $dataKey){
-            $queryString = $queryString . "`$dataKey`=?,";
+        foreach ($dataKeys as $dataKey) {
+            $queryString = $queryString."`$dataKey`=?,";
         }
 
-        $queryString = rtrim($queryString, ",") .' WHERE '.$conditionString;
+        $queryString = rtrim($queryString, ',').' WHERE '.$conditionString;
 
         $query = $conn->prepare($queryString);
-        $query->bind_param($this->generateBindParamTypes($dataValues) . $types, ...[...$dataValues, ...$conditions]);
+        $query->bind_param($this->generateBindParamTypes($dataValues).$types, ...[...$dataValues, ...$conditions]);
 
         $result = $query->execute();
         $conn->close();
@@ -169,7 +168,7 @@ class Controller
         }
     }
 
-    public function response(int $responseCode=500, array $res = [])
+    public function response(int $responseCode = 500, array $res = [])
     {
         http_response_code($responseCode);
         header('Content-Type: application/json; charset=utf-8');
@@ -179,7 +178,7 @@ class Controller
     private function generateBindParamTypes(array $data): string
     {
         $types = [];
-        foreach($data as $value){
+        foreach ($data as $value) {
             if (! is_numeric($value)) {
                 array_push($types, 's');
             } else {
@@ -187,7 +186,7 @@ class Controller
             }
         }
 
-        return implode("", $types);
+        return implode('', $types);
 
     }
 
@@ -199,11 +198,11 @@ class Controller
             $conditionStrings = [];
 
             foreach ($conditions as $condition) {
-                $preparedStatement = $condition['col'].$condition['operator']."?";
+                $preparedStatement = $condition['col'].$condition['operator'].'?';
 
                 array_push($preparedStatements, $preparedStatement);
                 array_push($conditionStrings, filter_var($condition['value'], FILTER_SANITIZE_SPECIAL_CHARS));
-                
+
                 if (! is_numeric($condition['value'])) {
                     array_push($preparedStatementTypes, 's');
                 } else {
@@ -211,7 +210,7 @@ class Controller
                 }
             }
 
-            return [implode(" AND ", $preparedStatements), $this->generateBindParamTypes($conditionStrings), $conditionStrings];
+            return [implode(' AND ', $preparedStatements), $this->generateBindParamTypes($conditionStrings), $conditionStrings];
         } else {
             return '1';
         }
