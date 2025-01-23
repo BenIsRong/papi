@@ -123,30 +123,39 @@ class Controller
     public function deleteFrom(string $table, array $conditions = [])
     {
         $conn = $this->connectDatabase();
-        $where = [];
 
         if (count($conditions) != 0) {
-            $where = $this->generateConditionString($conditions);
-        } else {
-            $conn->close();
+            [$conditionString, $types, $conditions] = $this->generateConditionString($conditions);
 
-            return false;
-        }
+            // $selectQuery = $conn->prepare("SELECT COUNT(*) as num FROM `$table` WHERE " . $conditionString);
+            // $selectQuery->bind_param($types, ...$conditions);
+            // $selectResult = $selectQuery->get_result();
+            // $selectResult = $selectResult->fetch_all(MYSQLI_ASSOC);
+            // if($selectResult['num'] > 0){
+            //     $query = $conn->prepare("DELETE FROM `$table` WHERE " . $conditionString);
+            //     $query->bind_param($types, ...$conditions);
+            //     $result = $query->execute();
 
-        $select = $conn->query("SELECT COUNT(*) as num FROM $table WHERE ".$where)->fetch_assoc();
+            //     $conn->close();
+            //     return $result;
+            // }
 
-        if ($select['num'] > 0) {
-            $query = "DELETE FROM `$table` WHERE ".$where;
-            $result = $conn->query($query);
+            $query = $conn->prepare("DELETE FROM `$table` WHERE ".$conditionString);
+            $query->bind_param($types, ...$conditions);
+            $result = $query->execute();
+
             $conn->close();
 
             return $result;
+
+            $conn->close();
+
+            return false;
         } else {
             $conn->close();
 
             return false;
         }
-
     }
 
     public function deleteAll(string $table)
