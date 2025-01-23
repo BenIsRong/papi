@@ -61,13 +61,13 @@ class Controller
     public function insertInto(string $table, array $data)
     {
         $conn = $this->connectDatabase();
-        $data_keys = array_keys($data);
-        $data_values = $this->dataToValues($data);
+        $dataKeys = array_keys($data);
+        $dataValues = $this->dataToValues($data);
 
-        echo "INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.rtrim(str_repeat("?,", count($data_values)), ",").')';
+        echo "INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat("?,", count($dataValues)), ",").')';
 
-        $query = $conn->prepare("INSERT INTO $table (".implode(', ', $data_keys).') VALUES ('.rtrim(str_repeat("?,", count($data_values)), ",").')');
-        $query->bind_param($this->generateBindParamTypes($data_values), ...$data_values);
+        $query = $conn->prepare("INSERT INTO $table (".implode(', ', $dataKeys).') VALUES ('.rtrim(str_repeat("?,", count($dataValues)), ",").')');
+        $query->bind_param($this->generateBindParamTypes($dataValues), ...$dataValues);
         $result = $query->execute();
         $conn->close();
 
@@ -99,11 +99,23 @@ class Controller
     public function updateInto(string $table, array $data, array $conditions = [])
     {
         $conn = $this->connectDatabase();
-        [$data, $conditions] = $this->dataToValues($data, $conditions, true);
+        $dataKeys = array_keys($data);
+        $dataValues = $this->dataToValues($data);
 
-        $query = "UPDATE `$table` SET ".implode(', ', $data).' WHERE '.$conditions;
+        [$conditionString, $types, $conditions] = $this->generateConditionString($conditions);
 
-        $result = $conn->query($query);
+        $queryString = "UPDATE `$table` SET ";
+
+        foreach($dataKeys as $dataKey){
+            $queryString = $queryString . "`$dataKey`=?,";
+        }
+
+        $queryString = rtrim($queryString, ",") .' WHERE '.$conditionString;
+
+        $query = $conn->prepare($queryString);
+        $query->bind_param($this->generateBindParamTypes($dataValues) . $types, ...[...$dataValues, ...$conditions]);
+
+        $result = $query->execute();
         $conn->close();
 
         return $result;
@@ -171,7 +183,7 @@ class Controller
             if (! is_numeric($value)) {
                 array_push($types, 's');
             } else {
-                array_push($types, str_contains($value, '.') ? 'f' : 'i');
+                array_push($types, str_contains($value, '.') ? 'd' : 'i');
             }
         }
 
@@ -195,7 +207,7 @@ class Controller
                 if (! is_numeric($condition['value'])) {
                     array_push($preparedStatementTypes, 's');
                 } else {
-                    array_push($preparedStatementTypes, str_contains($condition['value'], '.') ? 'f' : 'i');
+                    array_push($preparedStatementTypes, str_contains($condition['value'], '.') ? 'd' : 'i');
                 }
             }
 
@@ -205,42 +217,21 @@ class Controller
         }
     }
 
-    private function dataToValues(array $data, array $conditions = [], bool $update = false)
+    private function dataToValues(array $data)
     {
-        if (! $update) {
-            $vals = [];
-            if (! array_is_list($data)) {
-                $data = array_values($data);
-            }
-
-            foreach ($data as $value) {
-                if (! is_numeric($value)) {
-                    array_push($vals, "'$value'");
-                } else {
-                    array_push($vals, $value);
-                }
-            }
-
-            return $vals;
-        } else {
-            $vals = [];
-            $where = '';
-
-            foreach ($data as $key => $value) {
-                if (! is_numeric($value)) {
-                    array_push($vals, "`$key`='$value'");
-                } else {
-                    array_push($vals, "`$key`=$value");
-                }
-            }
-
-            if (count($conditions) != 0) {
-                $where = $this->generateConditionString($conditions);
-            } else {
-                $where = '1';
-            }
-
-            return [$vals, $where];
+        $vals = [];
+        if (! array_is_list($data)) {
+            $data = array_values($data);
         }
+
+        foreach ($data as $value) {
+            if (! is_numeric($value)) {
+                array_push($vals, "'$value'");
+            } else {
+                array_push($vals, $value);
+            }
+        }
+
+        return $vals;
     }
 }
