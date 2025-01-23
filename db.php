@@ -77,15 +77,20 @@ class Controller
     public function insertMultiple(string $table, array $columns, array $datas)
     {
         $conn = $this->connectDatabase();
-        $query = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
+        $queryString = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
+        $values = [];
 
         foreach ($datas as $data) {
-            $query = $query.'('.implode(', ', $this->dataToValues($data)).'),';
+            $value = $this->dataToValues($data);
+            $values = [...$values, ...$value];
+            $queryString = $queryString . '(' . rtrim(str_repeat('?,', count($value)), ',') . '),';
         }
 
-        $query = rtrim($query, ',');
+        $queryString = rtrim($queryString, ',');
 
-        $result = $conn->query($query);
+        $query = $conn->prepare($queryString);
+        $query->bind_param($this->generateBindParamTypes($values), ...$values);
+        $result = $query->execute();
         $conn->close();
 
         return $result;
