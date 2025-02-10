@@ -1,6 +1,9 @@
 <?php
 
-class Controller
+include_once './base.php';
+use Base as Base;
+
+class Controller extends Base
 {
     public function connectDatabase()
     {
