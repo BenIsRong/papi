@@ -46,7 +46,7 @@ class Setup extends DB
                                 'name' => 'admin',
                                 'type' => 'TINYINT',
                                 'null' => false,
-                                'default' => '1',
+                                'default' => '0',
                             ],
                         ], 'id');
 
@@ -78,19 +78,13 @@ class Setup extends DB
                         $username = $this->io('Username');
                         $email = $this->io('Email');
                         $password = $this->io('Password');
-                        $this->conn->query("INSERT INTO users (
-                        `name`,
-                        `username`,
-                        `email`,
-                        `password`,
-                        `admin`
-                        ) VALUES (
-                        '$name',
-                        '$username',
-                        '$email',
-                        '$password',
-                        1
-                        )");
+                        $this->insertInto('users', [
+                            'name' => $name,
+                            'username' => $username,
+                            'email' => $email,
+                            'password' => $password,
+                            'admin' => 1,
+                        ]);
 
                         $result = $this->conn->query("SELECT id from users WHERE email='$email' AND name='$name'")->fetch_assoc();
                         $id = $result['id'];
@@ -108,7 +102,6 @@ class Setup extends DB
                 }
             }
         } catch (Throwable $t) {
-            echo $t;
             echo 'Unable to finish Initialisation. Please check if the database in .env has not been created.';
         }
     }
