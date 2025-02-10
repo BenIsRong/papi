@@ -1,9 +1,9 @@
 <?php
 
 include_once './db.php';
-use Controller as Controller;
+use DB as DB;
 
-class Setup extends Controller
+class Setup extends DB
 {
     private $conn;
 
@@ -15,23 +15,65 @@ class Setup extends Controller
 
             if (! is_null($this->conn)) {
                 if ($this->io('Create the default users and tokens tables? (y/n)', true, 'y')) {
-                    $this->conn->query('CREATE TABLE users(
-                    `id` INT NOT NULL AUTO_INCREMENT,
-                    `name` TEXT NOT NULL,
-                    `username` TEXT NOT NULL,
-                    `email` TEXT NOT NULL,
-                    `password` TEXT NOT NULL,
-                    `admin` TINYINT NOT NULL DEFAULT 1,
-                    PRIMARY KEY (`id`))');
+                    $this->createTable('users',
+                        [
+                            [
+                                'name' => 'id',
+                                'type' => 'INT',
+                                'null' => false,
+                            ],
+                            [
+                                'name' => 'name',
+                                'type' => 'TEXT',
+                                'null' => false,
+                            ],
+                            [
+                                'name' => 'username',
+                                'type' => 'TEXT',
+                                'null' => false,
+                            ],
+                            [
+                                'name' => 'email',
+                                'type' => 'TEXT',
+                                'null' => false,
+                            ],
+                            [
+                                'name' => 'password',
+                                'type' => 'TEXT',
+                                'null' => false,
+                            ],
+                            [
+                                'name' => 'admin',
+                                'type' => 'TINYINT',
+                                'null' => false,
+                                'default' => '1',
+                            ],
+                        ], 'id');
 
-                    $this->conn->query('CREATE TABLE tokens(
-                    `id` INT NOT NULL AUTO_INCREMENT,
-                    `user_id` INT NOT NULL,
-                    `token` TEXT NOT NULL,
-                    `expiration` DATETIME NOT NULL,
-                    PRIMARY KEY (`id`))');
-                    
-                    if($this->io('Create a default user? (y/n)', true, 'y')){
+                    $this->createTable('tokens', [
+                        [
+                            'name' => 'id',
+                            'type' => 'INT',
+                            'null' => false,
+                        ],
+                        [
+                            'name' => 'user_id',
+                            'type' => 'INT',
+                            'null' => false,
+                        ],
+                        [
+                            'name' => 'token',
+                            'type' => 'TEXT',
+                            'null' => false,
+                        ],
+                        [
+                            'name' => 'expiration',
+                            'type' => 'DATETIME',
+                            'null' => false,
+                        ],
+                    ], 'id');
+
+                    if ($this->io('Create a default user? (y/n)', true, 'y')) {
                         $name = $this->io('Name');
                         $username = $this->io('Username');
                         $email = $this->io('Email');
@@ -59,15 +101,15 @@ class Setup extends Controller
                             'token' => $uuid,
                             'expiration' => $expiry,
                         ]);
-                        echo "Finished initialisation!";
-                        echo " User created with token " . $uuid;
+                        echo 'Finished initialisation!';
+                        echo ' User created with token '.$uuid;
                         echo "\nPlease keep this token carefully as this is how you interact with your API!";
                     }
                 }
             }
         } catch (Throwable $t) {
             echo $t;
-            echo "Unable to finish Initialisation. Please check if the database in .env has not been created.";
+            echo 'Unable to finish Initialisation. Please check if the database in .env has not been created.';
         }
     }
 

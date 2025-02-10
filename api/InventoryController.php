@@ -1,9 +1,9 @@
 <?php
 
 include_once './db.php';
-use Controller as Controller;
+use DB as DB;
 
-class InventoryController extends Controller
+class InventoryController extends DB
 {
     public function create()
     {

@@ -1,4 +1,5 @@
 <?php
+
 class Base
 {
     /**
@@ -27,7 +28,6 @@ class Base
         return $answer;
 
     }
-    
 
     public function uuid()
     {

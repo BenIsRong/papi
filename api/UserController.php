@@ -1,9 +1,9 @@
 <?php
 
 include_once './db.php';
-use Controller as Controller;
+use DB as DB;
 
-class UserController extends Controller
+class UserController extends DB
 {
     public function create()
     {

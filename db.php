@@ -3,7 +3,7 @@
 include_once './base.php';
 use Base as Base;
 
-class Controller extends Base
+class DB extends Base
 {
     public function connectDatabase()
     {
@@ -50,6 +50,27 @@ class Controller extends Base
         }
 
         return $res;
+    }
+
+    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true)
+    {
+        $conn = $this->connectDatabase();
+        $query = $checkExists ? "CREATE TABLE $table(" : "CREATE TABLE IF NOT EXISTS $table(";
+
+        foreach ($data as $column) {
+            $query .= '`'.$column['name'].'` ';
+            $query .= $column['type'].' ';
+            $query .= $column['null'] ? 'NULL ' : 'NOT NULL ';
+            $query .= (strtolower($column['type']) == 'int' && strtolower($column['name']) == strtolower($primaryKey)) ? 'AUTO_INCREMENT ' : '';
+            $query .= array_key_exists('default', $column) ? "DEFAULT '".$column['default']."'" : '';
+            $query .= ',';
+        }
+        $query .= $primaryKey == '' ? ')' : "PRIMARY KEY (`$primaryKey`))";
+
+        $result = $conn->query($query);
+        $conn->close();
+
+        return $result;
     }
 
     public function insertInto(string $table, array $data)
