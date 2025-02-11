@@ -60,6 +60,41 @@
                 }
             ],
             "pk": "id"
+        },
+        "inventories": {
+            "columns" : [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "cost",
+                    "type" : "DECIMAL(10,2)",
+                    "null" : false
+                },
+                {
+                    "name" : "price",
+                    "type" : "DECIMAL(10,2)",
+                    "null" : false
+                },
+                {
+                    "name" : "stock",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "sold",
+                    "type" : "INT",
+                    "null" : false
+                }
+            ],
+            "pk": "id"
         }
     }
 }

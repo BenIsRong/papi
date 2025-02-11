@@ -1,0 +1,7 @@
+<?php
+
+namespace Controllers;
+
+use Src\Database;
+
+class Controller extends Database {}

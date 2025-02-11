@@ -1,10 +1,16 @@
 <?php
 
-include_once './base.php';
-use Base as Base;
+namespace Src;
 
-class DB extends Base
+use mysqli;
+
+class Database extends Base
 {
+    /**
+     * Connect to database
+     *
+     * @return object
+     */
     public function connectDatabase()
     {
         $env = parse_ini_file('.env');
@@ -18,6 +24,12 @@ class DB extends Base
         return $conn;
     }
 
+    /**
+     * Check if API token exists
+     *
+     * @return bool
+     */
+    // TODO: check if expired or not
     public function checkToken()
     {
         $conn = $this->connectDatabase();
@@ -35,6 +47,11 @@ class DB extends Base
         }
     }
 
+    /**
+     * View data based on conditions
+     *
+     * @return array
+     */
     public function view(string $table, array $conditions = [])
     {
         $conn = $this->connectDatabase();
@@ -52,6 +69,11 @@ class DB extends Base
         return $res;
     }
 
+    /**
+     * Create table based on given params
+     *
+     * @return mixed
+     */
     public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true)
     {
         $conn = $this->connectDatabase();
@@ -73,6 +95,11 @@ class DB extends Base
         return $result;
     }
 
+    /**
+     * Insert into table based on given params
+     *
+     * @return mixed
+     */
     public function insertInto(string $table, array $data)
     {
         $conn = $this->connectDatabase();
@@ -87,6 +114,11 @@ class DB extends Base
         return $result;
     }
 
+    /**
+     * Insert multiple rows into table based on given params
+     *
+     * @return mixed
+     */
     public function insertMultiple(string $table, array $columns, array $datas)
     {
         $conn = $this->connectDatabase();
@@ -104,6 +136,11 @@ class DB extends Base
         return $result;
     }
 
+    /**
+     * Update row in table based on given params
+     *
+     * @return mixed
+     */
     public function updateInto(string $table, array $data, array $conditions = [])
     {
         $conn = $this->connectDatabase();
@@ -117,6 +154,11 @@ class DB extends Base
         return $result;
     }
 
+    /**
+     * Delete row in table based on given params
+     *
+     * @return mixed
+     */
     public function deleteFrom(string $table, array $conditions = [])
     {
         $conn = $this->connectDatabase();
@@ -146,6 +188,11 @@ class DB extends Base
 
     }
 
+    /**
+     * Delete all in given table
+     *
+     * @return mixed
+     */
     public function deleteAll(string $table)
     {
         $conn = $this->connectDatabase();
@@ -165,12 +212,36 @@ class DB extends Base
         }
     }
 
+    /**
+     * Generate an HTTP response
+     *
+     * @return void
+     */
     public function response(int $responseCode, array $res = [])
     {
         http_response_code($responseCode);
         echo json_encode($res);
     }
 
+    /**
+     * Check if table exists in database
+     *
+     * @return bool
+     */
+    public function tableExists(string $table)
+    {
+        $conn = $this->connectDatabase();
+
+        $result = $conn->query("SHOW TABLES LIKE '$table'");
+
+        return mysqli_num_rows($result) == 1;
+    }
+
+    /**
+     * Generate a condition string for queries with WHERE clause
+     *
+     * @return string
+     */
     private function generateConditionString(array $conditions)
     {
         if (count($conditions) > 0) {
@@ -192,6 +263,11 @@ class DB extends Base
         }
     }
 
+    /**
+     * Get data from given array based on conditions
+     *
+     * @return array
+     */
     private function dataToValues(array $data, array $conditions = [], bool $update = false)
     {
         if (! $update) {

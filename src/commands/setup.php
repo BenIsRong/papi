@@ -1,9 +1,12 @@
 <?php
 
-include_once '../papi/db.php';
-use DB as DB;
+namespace Src\Commands;
 
-class Setup extends DB
+use mysqli;
+use Src\Database;
+use Throwable;
+
+class Setup extends Database
 {
     private $conn;
 
@@ -53,7 +56,7 @@ class Setup extends DB
                         if ($this->io('Create the remaining tables left in config.json? (y/n)', true, 'y')) {
                             foreach ($tables as $key => $table) {
                                 try {
-                                    $this->createTable($key, $table['columns'], array_key_exists('pk', $table)) ? $table['pk'] : '';
+                                    $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '');
 
                                 } catch (Throwable $t) {
                                     $errors += 1;
