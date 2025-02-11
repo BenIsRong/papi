@@ -1,11 +1,8 @@
 #!/usr/bin/env php
 <?php
-include_once './commands/init.php';
-include_once './commands/controller.php';
-include_once './db.php';
-use Setup as Setup;
-use DB as DB;
-use Controller as Controller;
+use Src\Commands\Setup;
+use Src\DB;
+use Src\Commands\Controller as CreateController;
 
 $db = new DB();
 
@@ -72,7 +69,7 @@ switch(strtolower($argv[1])){
                 }
                 break;
             case 'controller':
-                $controller = new Controller($argv[3]);
+                $controller = new CreateController($argv[3]);
         }
         break;
     default:

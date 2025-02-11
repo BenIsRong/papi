@@ -1,7 +1,10 @@
 <?php
 
-include_once '../papi/db.php';
-use DB as DB;
+namespace Src\Commands;
+
+use mysqli;
+use Src\DB;
+use Throwable;
 
 class Setup extends DB
 {

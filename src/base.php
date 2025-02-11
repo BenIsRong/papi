@@ -1,5 +1,9 @@
 <?php
 
+namespace Src;
+
+use Throwable;
+
 class Base
 {
     /**
