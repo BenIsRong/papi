@@ -4,6 +4,7 @@ namespace Models;
 
 use Src\Database;
 
-class Model extends Database{
-    
+class Model extends Database
+{
+    private $db = 'TempDatabaseName';
 }

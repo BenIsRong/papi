@@ -78,11 +78,15 @@ switch(strtolower($argv[1])){
                     foreach($remArgs as $arg){
                         switch(true){
                             case str_starts_with($arg, '--model') | str_starts_with($arg, '-m'):
-                                if(substr_count($arg, "=") == 1 && strlen(end(explode("=", $arg))) > 0){
-                                    new CreateModel(end(explode("=", $arg)));
-                                }else{
-                                    new CreateModel(str_ends_with(strtolower($argv[3]), "controller") ? substr($argv[3], 0, -10) : $argv[3]);
+                                if(substr_count($arg, "=") == 1){
+                                    $arg = explode("=", $arg);
+                                    $arg = end($arg);
+                                    if(strlen($arg) > 0){
+                                        new CreateModel($arg);
+                                        break;
+                                    }
                                 }
+                                new CreateModel(str_ends_with(strtolower($argv[3]), "controller") ? substr($argv[3], 0, -10) : $argv[3]);
                                 break;
                             default:
                                 break;
@@ -91,22 +95,38 @@ switch(strtolower($argv[1])){
                 }
                 break;
             case 'model':
-                new CreateModel($argv[3]);
+                $db = null;
                 $remArgs = array_slice($argv, 4);
                 if(count($remArgs) > 0){
                     foreach($remArgs as $arg){
                         switch(true){
                             case str_starts_with($arg, '--controller') | str_starts_with($arg, '-c'):
-                                if(substr_count($arg, "=") == 1 && strlen(end(explode("=", $arg))) > 0){
-                                    new CreateController($arg . "Controller");
-                                }else{
-                                    new CreateController($argv[3] . "Controller");
+                                if(substr_count($arg, "=") == 1){
+                                    $arg = explode("=", $arg);
+                                    $arg = end($arg);
+                                    if(strlen($arg) > 0){
+                                        new CreateController($arg . "Controller");
+                                        break;
+                                    }
                                 }
+                                new CreateController($argv[3] . "Controller");
                                 break;
+                            case str_starts_with($arg, '--db'):
+                                if(substr_count($arg, "=") == 1){
+                                    $arg = explode("=", $arg);
+                                    $arg = end($arg);
+                                    if(strlen($arg) > 0){
+                                        $db = $arg;
+                                    }
+                                    break;
+                                }
+
+                                
 
                         }
                     }
                 }
+                new CreateModel($argv[3], $db);
         }
         break;
     default:

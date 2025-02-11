@@ -2,9 +2,11 @@
 
 namespace Src\Commands;
 
-class Model
+use Src\Database;
+
+class Model extends Database
 {
-    public function __construct(string $name)
+    public function __construct(string $name, ?string $db = null)
     {
         if (! is_dir('models/')) {
             mkdir('models');
@@ -15,6 +17,12 @@ class Model
 
             $contents = file_get_contents("models/$name.php");
             $contents = str_replace('Model', ucfirst(strtolower($name)), $contents);
+            if (! is_null($db) && $this->tableExists($db)) {
+                $contents = str_replace('TempDatabaseName', $db, $contents);
+            } else {
+                $contents = str_replace("private \$db = 'TempDatabaseName';", '', $contents);
+            }
+
             file_put_contents("models/$name.php", $contents);
         }
     }
