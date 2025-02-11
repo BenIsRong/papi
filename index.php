@@ -1,84 +1,13 @@
 <?php
 
 require_once './base.php';
-// include './api/UserController.php';
-// include './api/InventoryController.php';
-// use InventoryController as InventoryController;
-// use UserController as UserController;
 
-class Router
-{
-    private array $routes = [];
+use Src\Router;
 
-    public function add(string $method, string $path, array $controller)
-    {
-        if (substr($path, -1) != '/') {
-            $path = $path.'/';
-        }
+$router = new Router;
 
-        $path = '/papi/api/'.$path;
+// add paths
 
-        array_push($this->routes, [
-            'path' => $path,
-            'method' => $method,
-            'controller' => $controller,
-        ]);
-    }
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-    public function dispatch(string $path)
-    {
-        if (substr($path, -1) != '/') {
-            $path = $path.'/';
-        }
-
-        foreach ($this->routes as $route) {
-            if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
-                [$class, $function] = $route['controller'];
-                $controllerInstance = new $class;
-                $controllerInstance->$function();
-            }
-        }
-    }
-
-    public function addCRUD(string $item, string $controller)
-    {
-        $cruds = [
-            'create' => 'POST',
-            'read' => 'GET',
-            'index' => 'GET',
-            'update' => 'PUT',
-            'delete' => 'DELETE',
-        ];
-
-        foreach ($cruds as $crud => $method) {
-            $path = '/papi/api/'.$item;
-
-            array_push($this->routes, [
-                'path' => $crud == 'index' ? $path.'/all/' : $path.'/',
-                'method' => $method,
-                'controller' => [$controller, $crud],
-            ]);
-        }
-    }
-
-    public function listRoutes()
-    {
-        echo 'The routes are: ';
-
-        foreach ($this->routes as $route) {
-            echo '<br />'.$route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1];
-        }
-    }
-}
-
-// $router = new Router;
-
-// $router->add('POST', 'user', [UserController::class, 'create']);
-// $router->add('POST', 'user/regenToken', [UserController::class, 'regenerateToken']);
-
-// $router->addCRUD('inventory', InventoryController::class);
-// $router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
-
-// $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// $router->dispatch($path);
+$router->dispatch($path);
