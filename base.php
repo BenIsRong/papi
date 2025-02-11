@@ -29,6 +29,11 @@ class Base
 
     }
 
+    /**
+     * Generate uuid v4
+     *
+     * @return string
+     */
     public function uuid()
     {
         $data = random_bytes(16);
@@ -37,5 +42,29 @@ class Base
         $data[8] = chr(ord($data[8]) & 0x3F | 0x80);
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
+     * Get json file as an associative array
+     *
+     * @return array|null
+     */
+    public function jsonToArray(string $filepath, ?string $key = null)
+    {
+        try {
+            $jsonFile = json_decode(file_get_contents($filepath), true);
+
+            if (! is_null($key)) {
+                if (array_key_exists($key, $jsonFile)) {
+                    return $jsonFile[$key];
+                } else {
+                    return $jsonFile;
+                }
+            }
+
+            return $jsonFile;
+        } catch (Throwable $t) {
+            return null;
+        }
     }
 }

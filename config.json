@@ -1,0 +1,100 @@
+{
+    "tables": {
+        "users" : {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "username",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "email",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "password",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "admin",
+                    "type" : "TINYINT",
+                    "null" : false,
+                    "default" : "0"
+                }
+            ],
+            "pk": "id"
+        },
+        "tokens" : {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "user_id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "token",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "expiration",
+                    "type" : "DATETIME",
+                    "null" : false
+                }
+            ],
+            "pk": "id"
+        },
+        "inventories": {
+            "columns" : [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "cost",
+                    "type" : "DECIMAL(10,2)",
+                    "null" : false
+                },
+                {
+                    "name" : "price",
+                    "type" : "DECIMAL(10,2)",
+                    "null" : false
+                },
+                {
+                    "name" : "stock",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "sold",
+                    "type" : "INT",
+                    "null" : false
+                }
+            ],
+            "pk": "id"
+        }
+    }
+}
