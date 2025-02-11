@@ -77,7 +77,7 @@ switch(strtolower($argv[1])){
                 if(count($remArgs) > 0){
                     foreach($remArgs as $arg){
                         switch(true){
-                            case str_starts_with($arg, '--model'):
+                            case str_starts_with($arg, '--model') | str_starts_with($arg, '-m'):
                                 if(substr_count($arg, "=") == 1 && strlen(end(explode("=", $arg))) > 0){
                                     new CreateModel(end(explode("=", $arg)));
                                 }else{
@@ -90,6 +90,23 @@ switch(strtolower($argv[1])){
                     }
                 }
                 break;
+            case 'model':
+                new CreateModel($argv[3]);
+                $remArgs = array_slice($argv, 4);
+                if(count($remArgs) > 0){
+                    foreach($remArgs as $arg){
+                        switch(true){
+                            case str_starts_with($arg, '--controller') | str_starts_with($arg, '-c'):
+                                if(substr_count($arg, "=") == 1 && strlen(end(explode("=", $arg))) > 0){
+                                    new CreateController($arg . "Controller");
+                                }else{
+                                    new CreateController($argv[3] . "Controller");
+                                }
+                                break;
+
+                        }
+                    }
+                }
         }
         break;
     default:
