@@ -1,9 +1,9 @@
 <?php
 
 include_once './db.php';
-use Controller as Controller;
+use DB as DB;
 
-class UserController extends Controller
+class UserController extends DB
 {
     public function create()
     {
@@ -61,15 +61,5 @@ class UserController extends Controller
         }
 
         $conn->close();
-    }
-
-    private function uuid()
-    {
-        $data = random_bytes(16);
-
-        $data[6] = chr(ord($data[6]) & 0x0F | 0x40);
-        $data[8] = chr(ord($data[8]) & 0x3F | 0x80);
-
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 }
