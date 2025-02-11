@@ -1,6 +1,6 @@
 <?php
 
-require_once('./base.php');
+require_once './base.php';
 // include './api/UserController.php';
 // include './api/InventoryController.php';
 // use InventoryController as InventoryController;

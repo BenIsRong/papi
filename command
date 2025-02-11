@@ -5,6 +5,7 @@ require_once('./base.php');
 
 use Src\Commands\Setup;
 use Src\Database as Database;
+use Src\Commands\Model as CreateModel;
 use Src\Commands\Controller as CreateController;
 
 switch(strtolower($argv[1])){
@@ -71,7 +72,24 @@ switch(strtolower($argv[1])){
                 }
                 break;
             case 'controller':
-                $controller = new CreateController($argv[3]);
+                new CreateController(str_ends_with(strtolower($argv[3]), "controller") ? $argv[3] : $argv[3] . "Controller");
+                $remArgs = array_slice($argv, 4);
+                if(count($remArgs) > 0){
+                    foreach($remArgs as $arg){
+                        switch(true){
+                            case str_starts_with($arg, '--model'):
+                                if(substr_count($arg, "=") == 1 && strlen(end(explode("=", $arg))) > 0){
+                                    new CreateModel(end(explode("=", $arg)));
+                                }else{
+                                    new CreateModel(str_ends_with(strtolower($argv[3]), "controller") ? substr($argv[3], 0, -10) : $argv[3]);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                break;
         }
         break;
     default:

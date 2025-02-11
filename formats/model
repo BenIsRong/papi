@@ -1,0 +1,9 @@
+<?php
+
+namespace Models;
+
+use Src\Database;
+
+class Model extends Database{
+    
+}
