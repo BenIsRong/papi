@@ -120,9 +120,6 @@ switch(strtolower($argv[1])){
                                     }
                                     break;
                                 }
-
-                                
-
                         }
                     }
                 }
