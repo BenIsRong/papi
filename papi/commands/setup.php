@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Commands;
+namespace Papi\Commands;
 
 use mysqli;
-use Src\Database;
+use Papi\Database;
 use Throwable;
 
 class Setup extends Database

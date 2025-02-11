@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Papi\Commands;
 
 class Controller
 {

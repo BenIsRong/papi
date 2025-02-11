@@ -1,6 +1,6 @@
 <?php
 
-namespace Src;
+namespace Papi;
 
 use mysqli;
 
@@ -9,9 +9,9 @@ class Database extends Base
     /**
      * Connect to database
      *
-     * @return object
+     * @return mixed
      */
-    public function connectDatabase()
+    public function connectDatabase(bool $withToken = true)
     {
         $env = parse_ini_file('.env');
 
@@ -19,6 +19,10 @@ class Database extends Base
 
         if ($conn->connect_error) {
             exit('Connection failed: '.$conn->connect_error);
+        }
+
+        if ($withToken) {
+            return $this->checkToken() ? $conn : null;
         }
 
         return $conn;
@@ -32,7 +36,7 @@ class Database extends Base
     // TODO: check if expired or not
     public function checkToken()
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase(false);
         $headers = apache_request_headers();
         $token = explode(' ', $headers['Authorization']);
         $token = end($token);
@@ -52,9 +56,9 @@ class Database extends Base
      *
      * @return array
      */
-    public function view(string $table, array $conditions = [])
+    public function view(string $table, array $conditions = [], bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         $res = [];
         $conditionString = $this->generateConditionString($conditions);
 
@@ -74,9 +78,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true)
+    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true, bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         $query = $checkExists ? "CREATE TABLE $table(" : "CREATE TABLE IF NOT EXISTS $table(";
 
         foreach ($data as $column) {
@@ -100,9 +104,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function insertInto(string $table, array $data)
+    public function insertInto(string $table, array $data, bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
@@ -119,9 +123,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function insertMultiple(string $table, array $columns, array $datas)
+    public function insertMultiple(string $table, array $columns, array $datas, bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         $query = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
 
         foreach ($datas as $data) {
@@ -141,9 +145,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function updateInto(string $table, array $data, array $conditions = [])
+    public function updateInto(string $table, array $data, array $conditions = [], bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
 
         $query = "UPDATE `$table` SET ".implode(', ', $data).' WHERE '.$conditions;
@@ -159,9 +163,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function deleteFrom(string $table, array $conditions = [])
+    public function deleteFrom(string $table, array $conditions = [], bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
         $where = [];
 
         if (count($conditions) != 0) {
@@ -193,9 +197,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function deleteAll(string $table)
+    public function deleteAll(string $table, bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
 
         $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
 
@@ -228,9 +232,9 @@ class Database extends Base
      *
      * @return bool
      */
-    public function tableExists(string $table)
+    public function tableExists(string $table, bool $checkToken = true)
     {
-        $conn = $this->connectDatabase();
+        $conn = $this->connectDatabase($checkToken);
 
         $result = $conn->query("SHOW TABLES LIKE '$table'");
 

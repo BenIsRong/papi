@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Commands;
+namespace Papi\Commands;
 
-use Src\Database;
+use Papi\Database;
 
 class Model extends Database
 {

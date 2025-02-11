@@ -1,0 +1,15 @@
+<?php
+
+namespace Models;
+
+use Papi\Models\BaseModel;
+
+class Model extends BaseModel
+{
+    private $table = 'TempDatabaseName';
+
+    private function __construct()
+    {
+        parent::__construct($this->table);
+    }
+}

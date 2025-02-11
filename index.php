@@ -2,7 +2,7 @@
 
 require_once './base.php';
 
-use Src\Router;
+use Papi\Router;
 
 $router = new Router;
 
