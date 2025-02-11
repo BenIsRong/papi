@@ -13,7 +13,7 @@ class Model extends Database
         }
 
         if (! file_exists("models/$name.php")) {
-            copy('formats/model', "models/$name.php");
+            copy('src/formats/model', "models/$name.php");
 
             $contents = file_get_contents("models/$name.php");
             $contents = str_replace('Model', ucfirst(strtolower($name)), $contents);

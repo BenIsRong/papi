@@ -11,7 +11,7 @@ class Controller
         }
 
         if (! file_exists("controllers/$name.php")) {
-            copy('formats/controller', "controllers/$name.php");
+            copy('src/formats/controller', "controllers/$name.php");
 
             $contents = file_get_contents("controllers/$name.php");
             $contents = str_replace('Controller', ucfirst(strtolower($name)), $contents);
