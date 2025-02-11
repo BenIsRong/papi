@@ -1,9 +1,10 @@
 <?php
 
-include './api/UserController.php';
-include './api/InventoryController.php';
-use InventoryController as InventoryController;
-use UserController as UserController;
+require_once('./base.php');
+// include './api/UserController.php';
+// include './api/InventoryController.php';
+// use InventoryController as InventoryController;
+// use UserController as UserController;
 
 class Router
 {
@@ -70,14 +71,14 @@ class Router
     }
 }
 
-$router = new Router;
+// $router = new Router;
 
-$router->add('POST', 'user', [UserController::class, 'create']);
-$router->add('POST', 'user/regenToken', [UserController::class, 'regenerateToken']);
+// $router->add('POST', 'user', [UserController::class, 'create']);
+// $router->add('POST', 'user/regenToken', [UserController::class, 'regenerateToken']);
 
-$router->addCRUD('inventory', InventoryController::class);
-$router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
+// $router->addCRUD('inventory', InventoryController::class);
+// $router->add('POST', 'inventory/create_multiple', [InventoryController::class, 'createMultiple']);
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$router->dispatch($path);
+// $router->dispatch($path);

@@ -3,10 +3,10 @@
 namespace Src\Commands;
 
 use mysqli;
-use Src\DB;
+use Src\Database;
 use Throwable;
 
-class Setup extends DB
+class Setup extends Database
 {
     private $conn;
 

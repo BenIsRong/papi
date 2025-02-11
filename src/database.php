@@ -4,7 +4,7 @@ namespace Src;
 
 use mysqli;
 
-class DB extends Base
+class Database extends Base
 {
     /**
      * Connect to database

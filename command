@@ -1,10 +1,11 @@
 #!/usr/bin/env php
 <?php
-use Src\Commands\Setup;
-use Src\DB;
-use Src\Commands\Controller as CreateController;
 
-$db = new DB();
+require_once('./base.php');
+
+use Src\Commands\Setup;
+use Src\Database as Database;
+use Src\Commands\Controller as CreateController;
 
 switch(strtolower($argv[1])){
     case 'init':
@@ -15,6 +16,7 @@ switch(strtolower($argv[1])){
             case 'table':
                 $tables = $db->jsonToArray('config.json', 'tables');
                 $errors = 0;
+                $db  = new Database;
                 switch(strtolower($argv[3])){
                     case 'all':
                         foreach ($tables as $key => $table) {

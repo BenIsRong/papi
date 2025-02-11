@@ -1,8 +1,9 @@
 <?php
 
-include_once '../papi/db.php';
-use DB as DB;
+namespace Controllers;
 
-class Controller extends DB{
+use Src\Database;
+
+class Controller extends Database{
     
 }

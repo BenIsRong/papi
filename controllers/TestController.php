@@ -1,6 +1,9 @@
 <?php
 
-include_once '../papi/db.php';
-use DB as DB;
+namespace Testcontrollers;
 
-class Testcontroller extends DB {}
+use Src\Database;
+
+class Testcontroller extends Database{
+    
+}
