@@ -78,8 +78,16 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true, bool $checkToken = true)
+    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true, bool $softDeleteable = true, bool $checkToken = true)
     {
+        if ($softDeleteable) {
+            array_push($data, [
+                'name' => 'deleted_at',
+                'type' => 'DATETIME',
+                'null' => true,
+            ]);
+        }
+
         $conn = $this->connectDatabase($checkToken);
         $query = $checkExists ? "CREATE TABLE $table(" : "CREATE TABLE IF NOT EXISTS $table(";
 
@@ -156,6 +164,17 @@ class Database extends Base
         $conn->close();
 
         return $result;
+    }
+
+    public function getCount(string $table, array $conditions = [], bool $checkToken = true)
+    {
+        $conn = $this->connectDatabase($checkToken);
+        $conditionString = $this->generateConditionString($conditions);
+
+        $result = $conn->query("SELECT COUNT(*) as num FROM $table WHERE $conditionString")->fetch_assoc();
+        $conn->close();
+
+        return $result['num'];
     }
 
     /**

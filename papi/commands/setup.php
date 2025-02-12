@@ -19,8 +19,8 @@ class Setup extends Database
 
             if (! is_null($this->conn)) {
                 if ($this->io('Create the default users and tokens tables? (y/n)', true, 'y')) {
-                    $this->createTable('users', $tables['users']['columns'], $tables['users']['pk'], true, false);
-                    $this->createTable('tokens', $tables['tokens']['columns'], $tables['tokens']['pk'], true, false);
+                    $this->createTable('users', $tables['users']['columns'], $tables['users']['pk'], true, true, false);
+                    $this->createTable('tokens', $tables['tokens']['columns'], $tables['tokens']['pk'], true, true, false);
 
                     unset($tables['users']);
                     unset($tables['tokens']);
@@ -34,7 +34,7 @@ class Setup extends Database
                             'name' => $name,
                             'username' => $username,
                             'email' => $email,
-                            'password' => $password,
+                            'password' => password_hash($password, PASSWORD_BCRYPT),
                             'admin' => 1,
                         ], false);
 
@@ -56,7 +56,7 @@ class Setup extends Database
                         if ($this->io("\n\nCreate the remaining tables left in config.json? (y/n)", true, 'y')) {
                             foreach ($tables as $key => $table) {
                                 try {
-                                    $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
+                                    $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, true, false);
 
                                 } catch (Throwable $t) {
                                     $errors += 1;
