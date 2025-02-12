@@ -1,6 +1,6 @@
 {
     "tables": {
-        "users" : {
+        "users": {
             "columns": [
                 {
                     "name" : "id",
@@ -28,6 +28,11 @@
                     "null" : false
                 },
                 {
+                    "name" : "role_id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
                     "name" : "admin",
                     "type" : "TINYINT",
                     "null" : false,
@@ -36,7 +41,7 @@
             ],
             "pk": "id"
         },
-        "tokens" : {
+        "tokens": {
             "columns": [
                 {
                     "name" : "id",
@@ -60,6 +65,55 @@
                 }
             ],
             "pk": "id"
+        },
+        "permissions": {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "login",
+                    "type" : "TINYINT",
+                    "null" : false
+                }
+            ],
+            "pk": "id"
+        },
+        "roles": {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                }
+            ], 
+            "pk": "id"
+        },
+        "roles_with_permissions": {
+            "columns": [
+                {
+                    "name" : "role_id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "permission_id",
+                    "type" : "INT",
+                    "null" : false
+                }
+            ]
         },
         "inventories": {
             "columns" : [

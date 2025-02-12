@@ -61,10 +61,10 @@ class Database extends Base
         $res = [];
         $conditionString = $this->generateConditionString($conditions);
 
-        $query = "SELECT * FROM $table WHERE ".$conditionString . ' LIMIT 1';
+        $query = "SELECT * FROM $table WHERE ".$conditionString.' LIMIT 1';
         $result = $conn->query($query)->fetch_assoc();
         $conn->close();
-        
+
         return $result;
 
         // while ($row = $result->fetch_assoc()) {
@@ -92,13 +92,13 @@ class Database extends Base
         $conn = $this->connectDatabase($checkToken);
         $query = $checkExists ? "CREATE TABLE $table(" : "CREATE TABLE IF NOT EXISTS $table(";
 
-        foreach ($data as $column) {
+        foreach ($data as $idx => $column) {
             $query .= '`'.$column['name'].'` ';
             $query .= $column['type'].' ';
             $query .= $column['null'] ? 'NULL ' : 'NOT NULL ';
             $query .= (strtolower($column['type']) == 'int' && strtolower($column['name']) == strtolower($primaryKey)) ? 'AUTO_INCREMENT ' : '';
             $query .= array_key_exists('default', $column) ? "DEFAULT '".$column['default']."'" : '';
-            $query .= ',';
+            $query .= $primaryKey == '' ? ($idx < count($data) - 1 ? ',' : '') : ',';
         }
         $query .= $primaryKey == '' ? ')' : "PRIMARY KEY (`$primaryKey`))";
 

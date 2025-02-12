@@ -4,7 +4,6 @@ namespace Papi\Commands;
 
 use mysqli;
 use Papi\Auth\Auth;
-use Papi\Database;
 use Throwable;
 
 class Setup extends Auth
@@ -22,9 +21,17 @@ class Setup extends Auth
                 if ($this->io('Create the default users and tokens tables? (y/n)', true, 'y')) {
                     $this->createTable('users', $tables['users']['columns'], $tables['users']['pk'], true, true, false);
                     $this->createTable('tokens', $tables['tokens']['columns'], $tables['tokens']['pk'], true, true, false);
+                    $this->createTable('permissions', $tables['permissions']['columns'], $tables['permissions']['pk'], true, false, false);
+                    $this->createTable('roles', $tables['roles']['columns'], $tables['roles']['pk'], true, false, false);
+                    $this->createTable('roles_with_permissions', $tables['roles_with_permissions']['columns'], '', true, false, false);
 
                     unset($tables['users']);
                     unset($tables['tokens']);
+                    unset($tables['permissions']);
+                    unset($tables['roles']);
+                    unset($tables['roles_with_permissions']);
+
+                    $adminRoleId = $this->initPermsAndRoles();
 
                     if ($this->io('Create a default user? (y/n)', true, 'y')) {
                         $name = $this->io('Name');
@@ -33,7 +40,7 @@ class Setup extends Auth
                             $email = $this->io('Email');
                         } while (! $this->validateEmail($email));
                         $password = $this->io('Password');
-                        $this->register($name, $username, $email, $password, true);
+                        $this->register($name, $username, $email, $password, true, $adminRoleId);
                         $uuid = $this->registerToken($email, $password);
                         echo 'User created with token '.$uuid;
                         echo "\nPlease keep this token carefully as this is how you interact with your API!";
@@ -80,5 +87,102 @@ class Setup extends Auth
         $conn->close();
 
         $this->conn = new mysqli($env['DB_HOST'], $env['DB_USERNAME'], $env['DB_PASSWORD'], $env['DB_NAME']);
+    }
+
+    /**
+     * Initialises the following tables:
+     * - permissions
+     * - roles
+     * - roles_with_permissions
+     * As well as returning the id of the "super admin" role to assign it
+     *
+     * @return int
+     */
+    private function initPermsAndRoles()
+    {
+        $adminRoleId = 0;
+        $roles = [
+            'super admin',
+            'admin',
+            'user',
+        ];
+        $perms = [
+            [
+                'name' => 'view',
+                'login' => false,
+            ],
+            [
+                'name' => 'update',
+                'login' => true,
+            ],
+            [
+                'name' => 'create',
+                'login' => true,
+            ],
+            [
+                'name' => 'delete',
+                'login' => true,
+            ],
+            [
+                'name' => 'admin_create',
+                'login' => true,
+            ],
+            [
+                'name' => 'admin_update',
+                'login' => true,
+            ],
+            [
+                'name' => 'admin_view',
+                'login' => true,
+            ],
+            [
+                'name' => 'admin_delete',
+                'login' => true,
+            ],
+        ];
+
+        foreach ($perms as $perm) {
+            $this->insertInto('permissions', [
+                'name' => $perm['name'],
+                'login' => $perm['login'],
+            ], false);
+        }
+
+        foreach ($roles as $role) {
+            $this->insertInto('roles', [
+                'name' => $role,
+            ], false);
+
+            $permsToRole = str_contains($role, 'admin') ? $perms : array_slice($perms, 0, 4);
+
+            foreach ($permsToRole as $perm) {
+                $permResult = $this->viewOne('permissions', [
+                    [
+                        'col' => 'name',
+                        'operator' => '=',
+                        'value' => $perm['name'],
+                    ],
+                ], false);
+                $roleResult = $this->viewOne('roles', [
+                    [
+                        'col' => 'name',
+                        'operator' => '=',
+                        'value' => $role,
+                    ],
+                ], false);
+
+                if ($role == 'super admin') {
+                    $adminRoleId = $roleResult['id'];
+                }
+
+                $this->insertInto('roles_with_permissions', [
+                    'role_id' => $roleResult['id'],
+                    'permission_id' => $permResult['id'],
+                ], false);
+
+            }
+        }
+
+        return $adminRoleId;
     }
 }

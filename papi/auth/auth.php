@@ -34,7 +34,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    public function register(string $name, string $username, string $email, string $password, bool $admin)
+    public function register(string $name, string $username, string $email, string $password, bool $admin, int $role)
     {
         if ($this->validateEmail($email)) {
             return $this->insertInto('users', [
@@ -43,6 +43,7 @@ class Auth extends Database
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_BCRYPT),
                 'admin' => $admin,
+                'role_id' => $role,
             ], false);
         } else {
             return false;
@@ -76,7 +77,7 @@ class Auth extends Database
 
     /**
      * Check if user is admin or not
-     * 
+     *
      * @return bool
      */
     public function isAdmin(string $email, string $password, string $token)
@@ -86,7 +87,7 @@ class Auth extends Database
                 'col' => 'email',
                 'operator' => '=',
                 'value' => $email,
-            ]
+            ],
         ], false);
 
         return $result['admin'];
