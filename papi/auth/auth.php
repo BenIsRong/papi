@@ -73,4 +73,22 @@ class Auth extends Database
 
         return false;
     }
+
+    /**
+     * Check if user is admin or not
+     * 
+     * @return bool
+     */
+    public function isAdmin(string $email, string $password, string $token)
+    {
+        $result = $this->viewOne('users', [
+            [
+                'col' => 'email',
+                'operator' => '=',
+                'value' => $email,
+            ]
+        ], false);
+
+        return $result['admin'];
+    }
 }

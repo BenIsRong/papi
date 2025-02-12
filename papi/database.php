@@ -51,6 +51,30 @@ class Database extends Base
     }
 
     /**
+     * View one based on conditions
+     *
+     * @return array
+     */
+    public function viewOne(string $table, array $conditions = [], bool $checkToken = true)
+    {
+        $conn = $this->connectDatabase($checkToken);
+        $res = [];
+        $conditionString = $this->generateConditionString($conditions);
+
+        $query = "SELECT * FROM $table WHERE ".$conditionString . ' LIMIT 1';
+        $result = $conn->query($query)->fetch_assoc();
+        $conn->close();
+        
+        return $result;
+
+        // while ($row = $result->fetch_assoc()) {
+        //     array_push($res, $row);
+        // }
+
+        // return $res;
+    }
+
+    /**
      * Create table based on given params
      *
      * @return mixed
