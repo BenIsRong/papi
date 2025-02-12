@@ -4,7 +4,7 @@ namespace Models;
 
 use Papi\Models\BaseModel;
 
-class Model extends BaseModel
+class TempModel extends BaseModel
 {
     private $table = 'TempDatabaseName';
 
