@@ -101,45 +101,9 @@ class Setup extends Auth
     private function initPermsAndRoles()
     {
         $adminRoleId = 0;
-        $roles = [
-            'super admin',
-            'admin',
-            'user',
-        ];
-        $perms = [
-            [
-                'name' => 'view',
-                'login' => false,
-            ],
-            [
-                'name' => 'update',
-                'login' => true,
-            ],
-            [
-                'name' => 'create',
-                'login' => true,
-            ],
-            [
-                'name' => 'delete',
-                'login' => true,
-            ],
-            [
-                'name' => 'admin_create',
-                'login' => true,
-            ],
-            [
-                'name' => 'admin_update',
-                'login' => true,
-            ],
-            [
-                'name' => 'admin_view',
-                'login' => true,
-            ],
-            [
-                'name' => 'admin_delete',
-                'login' => true,
-            ],
-        ];
+
+        $roles = $this->jsonToArray('config.json', 'roles');
+        $perms = $this->jsonToArray('config.json', 'permissions');
 
         foreach ($perms as $perm) {
             $this->insertInto('permissions', [
@@ -150,10 +114,33 @@ class Setup extends Auth
 
         foreach ($roles as $role) {
             $this->insertInto('roles', [
-                'name' => $role,
+                'name' => $role['name'],
             ], false);
 
-            $permsToRole = str_contains($role, 'admin') ? $perms : array_slice($perms, 0, 4);
+            $permsToRole = [];
+            if ($role['permissions']['include'][0] == '*') {
+                $permsToRole = $perms;
+            } else {
+                foreach ($perms as $perm) {
+                    if (in_array($perm['name'], $role['permissions']['include'])) {
+                        array_push($permsToRole, $perm);
+                    }
+                }
+            }
+
+            if (array_key_exists('exclude', $role['permissions'])) {
+                if ($roles['permissions']['exclude'][0] == '*') {
+                    $permsToRole = [];
+
+                    continue;
+                } else {
+                    foreach ($permsToRole as $idx => $perm) {
+                        if (in_array($perm['name'], $role['permissions']['include'])) {
+                            unset($permsToRole[$idx]);
+                        }
+                    }
+                }
+            }
 
             foreach ($permsToRole as $perm) {
                 $permResult = $this->viewOne('permissions', [
@@ -167,11 +154,11 @@ class Setup extends Auth
                     [
                         'col' => 'name',
                         'operator' => '=',
-                        'value' => $role,
+                        'value' => $role['name'],
                     ],
                 ], false);
 
-                if ($role == 'super admin') {
+                if ($role['name'] == 'super admin') {
                     $adminRoleId = $roleResult['id'];
                 }
 

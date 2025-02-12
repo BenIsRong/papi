@@ -150,5 +150,68 @@
             ],
             "pk": "id"
         }
-    }
+    },
+    "permissions": [
+        {
+            "name" : "view",
+            "login" : false
+        },
+        {
+            "name" : "update",
+            "login" : true
+        },
+        {
+            "name" : "create",
+            "login" : true
+        },
+        {
+            "name" : "delete",
+            "login" : true
+        },
+        {
+            "name" : "admin_create",
+            "login" : true
+        },
+        {
+            "name" : "admin_update",
+            "login" : true
+        },
+        {
+            "name" : "admin_view",
+            "login" : true
+        },
+        {
+            "name" : "admin_delete",
+            "login" : true
+        }
+    ],
+    "roles": [
+        {
+            "name": "super admin",
+            "permissions":{
+                "include": [
+                    "*"
+                ]
+            }
+        },
+        {
+            "name": "admin",
+            "permissions":{
+                "include": [
+                    "*"
+                ]
+            }
+        },
+        {
+            "name": "user",
+            "permissions":{
+                "include": [
+                    "view",
+                    "create",
+                    "update",
+                    "delete"
+                ]
+            }
+        }
+    ]
 }

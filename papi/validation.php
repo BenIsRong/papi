@@ -6,7 +6,7 @@ class Validation
 {
     /**
      * Validation for email
-     * 
+     *
      * @return bool
      */
     public function validateEmail(string $email)
