@@ -1,0 +1,78 @@
+{
+    "command" : "php command",
+    "help": {
+        "init": {
+            "main": {
+                "operation": "init",
+                "options": false,
+                "name": false,
+                "description": "initialise the project"
+            }
+        },
+        "create": {
+            "main": {
+                "operation": "create",
+                "options": true,
+                "name": true,
+                "description": "create specified items"
+            },
+            "operations": [
+                {
+                    "operation" : "table",
+                    "description": "create tables specified in config.json based on options",
+                    "options": [
+                        {
+                            "name": "all",
+                            "alt": "a",
+                            "description": "try to create all tables, but will fail and continue if a table cannot be created",
+                            "values": false
+                        },
+                        {
+                            "name": "restricted",
+                            "alt": "r",
+                            "description": "create specified tables only",
+                            "values": false
+                        },
+                        {
+                            "name": "remaining",
+                            "alt": "m",
+                            "description": "creates whatever remaining tables there are in config.json",
+                            "values": false
+                        }
+                    ]
+                },
+                {
+                    "operation": "controller",
+                    "description": "create a controller for the model",
+                    "options": [
+                        {
+                            "name": "model",
+                            "alt": "m",
+                            "description": "creates a model along with the controller",
+                            "values": true
+                        }
+                    ]
+                },
+                {
+                    "operation": "model",
+                    "description": "creates a model to interact with the database",
+                    "options": [
+                        {
+                            "name": "controller",
+                            "alt": "c",
+                            "description": "creates a controller along with the model",
+                            "values": true
+                        },
+                        
+                        {
+                            "name": "table",
+                            "alt": "t",
+                            "description": "associates a database table to the model",
+                            "values": true
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
