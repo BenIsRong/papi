@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Commands;
+namespace Papi\Commands;
 
 use mysqli;
-use Src\Database;
+use Papi\Database;
 use Throwable;
 
 class Setup extends Database
@@ -19,8 +19,8 @@ class Setup extends Database
 
             if (! is_null($this->conn)) {
                 if ($this->io('Create the default users and tokens tables? (y/n)', true, 'y')) {
-                    $this->createTable('users', $tables['users']['columns'], $tables['users']['pk']);
-                    $this->createTable('tokens', $tables['tokens']['columns'], $tables['tokens']['pk']);
+                    $this->createTable('users', $tables['users']['columns'], $tables['users']['pk'], true, false);
+                    $this->createTable('tokens', $tables['tokens']['columns'], $tables['tokens']['pk'], true, false);
 
                     unset($tables['users']);
                     unset($tables['tokens']);
@@ -36,7 +36,7 @@ class Setup extends Database
                             'email' => $email,
                             'password' => $password,
                             'admin' => 1,
-                        ]);
+                        ], false);
 
                         $result = $this->conn->query("SELECT id from users WHERE email='$email' AND name='$name'")->fetch_assoc();
                         $id = $result['id'];
@@ -46,17 +46,17 @@ class Setup extends Database
                             'user_id' => $id,
                             'token' => $uuid,
                             'expiration' => $expiry,
-                        ]);
-                        echo ' User created with token '.$uuid;
+                        ], false);
+                        echo 'User created with token '.$uuid;
                         echo "\nPlease keep this token carefully as this is how you interact with your API!";
                     }
 
                     if (count($tables) > 0) {
                         $errors = 0;
-                        if ($this->io('Create the remaining tables left in config.json? (y/n)', true, 'y')) {
+                        if ($this->io("\n\nCreate the remaining tables left in config.json? (y/n)", true, 'y')) {
                             foreach ($tables as $key => $table) {
                                 try {
-                                    $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '');
+                                    $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
 
                                 } catch (Throwable $t) {
                                     $errors += 1;
@@ -73,6 +73,7 @@ class Setup extends Database
                 }
             }
         } catch (Throwable $t) {
+            echo $t;
             echo "\nUnable to finish Initialisation. Please check if the database in .env has not been created.";
         }
     }

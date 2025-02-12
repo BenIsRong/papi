@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Commands;
+namespace Papi\Commands;
 
-use Src\Database;
+use Papi\Database;
 
 class Model extends Database
 {
@@ -12,19 +12,23 @@ class Model extends Database
             mkdir('models');
         }
 
-        if (! file_exists("models/$name.php")) {
-            copy('src/formats/model', "models/$name.php");
-
-            $contents = file_get_contents("models/$name.php");
-            $contents = str_replace('Model', ucfirst(strtolower($name)), $contents);
-            if (! is_null($db) && $this->tableExists($db)) {
-                $contents = str_replace('TempDatabaseName', $db, $contents);
-            } else {
-                $contents = str_replace('TempDatabaseName', $this->pluralise($name), $contents);
+        if (file_exists("models/$name.php")) {
+            if ($this->io('This model already exists! Are you sure you want to continue? If you continue, everything will be reset! (y/n)', true, 'n')) {
+                return null;
             }
-
-            file_put_contents("models/$name.php", $contents);
         }
+
+        copy('papi/formats/model', "models/$name.php");
+
+        $contents = file_get_contents("models/$name.php");
+        $contents = str_replace('TempModel', ucfirst(strtolower($name)), $contents);
+        if (! is_null($db) && $this->tableExists($db, false)) {
+            $contents = str_replace('TempDatabaseName', $db, $contents);
+        } else {
+            $contents = str_replace('TempDatabaseName', $this->pluralise($name), $contents);
+        }
+
+        file_put_contents("models/$name.php", $contents);
     }
 
     private function pluralise(string $name, bool $lower = true)

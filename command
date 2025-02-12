@@ -3,10 +3,10 @@
 
 require_once './base.php';
 
-use Src\Commands\Controller as CreateController;
-use Src\Commands\Model as CreateModel;
-use Src\Commands\Setup;
-use Src\Database as Database;
+use Papi\Commands\Controller as CreateController;
+use Papi\Commands\Model as CreateModel;
+use Papi\Commands\Setup;
+use Papi\Database as Database;
 
 $db = new Database;
 
@@ -24,7 +24,7 @@ switch (strtolower($argv[1])) {
                     case '-all': // create all tables, fail for table if already created
                         foreach ($tables as $key => $table) {
                             try {
-                                $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '');
+                                $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
                             } catch (Throwable $t) {
                                 $errors += 1;
                                 echo "\n$table could not be created...";
@@ -40,7 +40,7 @@ switch (strtolower($argv[1])) {
                         foreach ($names as $name) {
                             if (array_key_exists($name, $tables)) {
                                 try {
-                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '');
+                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
                                 } catch (Throwable $t) {
                                     $errors += 1;
                                     echo "\n$table could not be created...";
@@ -63,7 +63,7 @@ switch (strtolower($argv[1])) {
                         foreach ($tables as $key => $table) {
                             try {
                                 if (! $db->tableExists($key)) {
-                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', false);
+                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', false, false);
                                     $success += 1;
                                 } else {
                                     $found += 1;
