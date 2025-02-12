@@ -3,10 +3,11 @@
 namespace Papi\Commands;
 
 use mysqli;
+use Papi\Auth\Auth;
 use Papi\Database;
 use Throwable;
 
-class Setup extends Database
+class Setup extends Auth
 {
     private $conn;
 
@@ -28,32 +29,19 @@ class Setup extends Database
                     if ($this->io('Create a default user? (y/n)', true, 'y')) {
                         $name = $this->io('Name');
                         $username = $this->io('Username');
-                        $email = $this->io('Email');
+                        do {
+                            $email = $this->io('Email');
+                        } while (! $this->validateEmail($email));
                         $password = $this->io('Password');
-                        $this->insertInto('users', [
-                            'name' => $name,
-                            'username' => $username,
-                            'email' => $email,
-                            'password' => password_hash($password, PASSWORD_BCRYPT),
-                            'admin' => 1,
-                        ], false);
-
-                        $result = $this->conn->query("SELECT id from users WHERE email='$email' AND name='$name'")->fetch_assoc();
-                        $id = $result['id'];
-                        $uuid = $this->uuid();
-                        $expiry = date('Y-m-d', strtotime('+1 month', strtotime(date('Y-m-d'))));
-                        $this->insertInto('tokens', [
-                            'user_id' => $id,
-                            'token' => $uuid,
-                            'expiration' => $expiry,
-                        ], false);
+                        $this->register($name, $username, $email, $password, true);
+                        $uuid = $this->registerToken($email, $password);
                         echo 'User created with token '.$uuid;
                         echo "\nPlease keep this token carefully as this is how you interact with your API!";
                     }
 
                     if (count($tables) > 0) {
-                        $errors = 0;
                         if ($this->io("\n\nCreate the remaining tables left in config.json? (y/n)", true, 'y')) {
+                            $errors = 0;
                             foreach ($tables as $key => $table) {
                                 try {
                                     $this->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, true, false);
@@ -64,9 +52,9 @@ class Setup extends Database
                                     continue;
                                 }
                             }
+                            echo "\nFinished creations of remaining tables with ".$errors.' fails and '.(count($tables) - $errors).' succeeded';
                         }
 
-                        echo "\nFinished creations of remaining tables with ".$errors.' fails and '.(count($tables) - $errors).' succeeded';
                     }
                     echo "\nFinished initialisation!";
 
