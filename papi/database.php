@@ -11,7 +11,7 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function connectDatabase(bool $withToken = true)
+    public function connectDatabase(bool $withToken = true, string $token = '')
     {
         $env = parse_ini_file('.env');
 
@@ -22,33 +22,10 @@ class Database extends Base
         }
 
         if ($withToken) {
-            return $this->checkToken() ? $conn : null;
+            return $this->checkToken($token) ? $conn : null;
         }
 
         return $conn;
-    }
-
-    /**
-     * Check if API token exists
-     *
-     * @return bool
-     */
-    // TODO: check if expired or not
-    public function checkToken()
-    {
-        $conn = $this->connectDatabase(false);
-        $headers = apache_request_headers();
-        $token = explode(' ', $headers['Authorization']);
-        $token = end($token);
-
-        $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
-        $conn->close();
-
-        if ($result['num'] > 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -56,9 +33,9 @@ class Database extends Base
      *
      * @return array
      */
-    public function view(string $table, array $conditions = [], bool $checkToken = true)
+    public function view(string $table, array $conditions = [], bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $res = [];
         $conditionString = $this->generateConditionString($conditions);
 
@@ -74,11 +51,29 @@ class Database extends Base
     }
 
     /**
+     * View one based on conditions
+     *
+     * @return array
+     */
+    public function viewOne(string $table, array $conditions = [], bool $checkToken = true, string $token = '')
+    {
+        $conn = $this->connectDatabase($checkToken, $token);
+        $res = [];
+        $conditionString = $this->generateConditionString($conditions);
+
+        $query = "SELECT * FROM $table WHERE ".$conditionString.' LIMIT 1';
+        $result = $conn->query($query)->fetch_assoc();
+        $conn->close();
+
+        return $result;
+    }
+
+    /**
      * Create table based on given params
      *
      * @return mixed
      */
-    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true, bool $softDeleteable = true, bool $checkToken = true)
+    public function createTable(string $table, array $data, string $primaryKey = '', bool $checkExists = true, bool $softDeleteable = true, bool $checkToken = true, string $token = '')
     {
         if ($softDeleteable) {
             array_push($data, [
@@ -88,16 +83,16 @@ class Database extends Base
             ]);
         }
 
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $query = $checkExists ? "CREATE TABLE $table(" : "CREATE TABLE IF NOT EXISTS $table(";
 
-        foreach ($data as $column) {
+        foreach ($data as $idx => $column) {
             $query .= '`'.$column['name'].'` ';
             $query .= $column['type'].' ';
             $query .= $column['null'] ? 'NULL ' : 'NOT NULL ';
             $query .= (strtolower($column['type']) == 'int' && strtolower($column['name']) == strtolower($primaryKey)) ? 'AUTO_INCREMENT ' : '';
             $query .= array_key_exists('default', $column) ? "DEFAULT '".$column['default']."'" : '';
-            $query .= ',';
+            $query .= $primaryKey == '' ? ($idx < count($data) - 1 ? ',' : '') : ',';
         }
         $query .= $primaryKey == '' ? ')' : "PRIMARY KEY (`$primaryKey`))";
 
@@ -112,9 +107,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function insertInto(string $table, array $data, bool $checkToken = true)
+    public function insertInto(string $table, array $data, bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $data_keys = array_keys($data);
         $data_values = $this->dataToValues($data);
 
@@ -131,9 +126,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function insertMultiple(string $table, array $columns, array $datas, bool $checkToken = true)
+    public function insertMultiple(string $table, array $columns, array $datas, bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $query = "INSERT INTO $table (".implode(', ', $columns).') VALUES ';
 
         foreach ($datas as $data) {
@@ -153,9 +148,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function updateInto(string $table, array $data, array $conditions = [], bool $checkToken = true)
+    public function updateInto(string $table, array $data, array $conditions = [], bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         [$data, $conditions] = $this->dataToValues($data, $conditions, true);
 
         $query = "UPDATE `$table` SET ".implode(', ', $data).' WHERE '.$conditions;
@@ -166,9 +161,9 @@ class Database extends Base
         return $result;
     }
 
-    public function getCount(string $table, array $conditions = [], bool $checkToken = true)
+    public function getCount(string $table, array $conditions = [], bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $conditionString = $this->generateConditionString($conditions);
 
         $result = $conn->query("SELECT COUNT(*) as num FROM $table WHERE $conditionString")->fetch_assoc();
@@ -182,9 +177,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function deleteFrom(string $table, array $conditions = [], bool $checkToken = true)
+    public function deleteFrom(string $table, array $conditions = [], bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
         $where = [];
 
         if (count($conditions) != 0) {
@@ -216,9 +211,9 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function deleteAll(string $table, bool $checkToken = true)
+    public function deleteAll(string $table, bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
 
         $select = $conn->query("SELECT COUNT(*) as num FROM $table")->fetch_assoc();
 
@@ -251,13 +246,38 @@ class Database extends Base
      *
      * @return bool
      */
-    public function tableExists(string $table, bool $checkToken = true)
+    public function tableExists(string $table, bool $checkToken = true, string $token = '')
     {
-        $conn = $this->connectDatabase($checkToken);
+        $conn = $this->connectDatabase($checkToken, $token);
 
         $result = $conn->query("SHOW TABLES LIKE '$table'");
 
         return mysqli_num_rows($result) == 1;
+    }
+
+    /**
+     * Check if API token exists
+     *
+     * @return bool
+     */
+    // TODO: check if expired or not
+    public function checkToken(string $token = '')
+    {
+        $conn = $this->connectDatabase(false);
+        if ($token == '') {
+            $headers = apache_request_headers();
+            $token = explode(' ', $headers['Authorization']);
+            $token = end($token);
+        }
+
+        $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
+        $conn->close();
+
+        if ($result['num'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

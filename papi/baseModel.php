@@ -1,9 +1,8 @@
 <?php
 
-namespace Papi\Models;
+namespace Papi;
 
 use DateTime;
-use Papi\Database;
 
 class BaseModel extends Database
 {

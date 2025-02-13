@@ -9,7 +9,7 @@ spl_autoload_register(function ($class) {
     require_once __DIR__."\\$path.php";
 });
 
-class Base
+class Base extends Validation
 {
     /**
      * Gets user input and returns either a boolean for the result or a string for the answer

@@ -24,7 +24,7 @@ switch (strtolower($argv[1])) {
                     case '-all': // create all tables, fail for table if already created
                         foreach ($tables as $key => $table) {
                             try {
-                                $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
+                                $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false, false);
                             } catch (Throwable $t) {
                                 $errors += 1;
                                 echo "\n$table could not be created...";
@@ -40,7 +40,7 @@ switch (strtolower($argv[1])) {
                         foreach ($names as $name) {
                             if (array_key_exists($name, $tables)) {
                                 try {
-                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false);
+                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false, false);
                                 } catch (Throwable $t) {
                                     $errors += 1;
                                     echo "\n$table could not be created...";
@@ -62,8 +62,8 @@ switch (strtolower($argv[1])) {
                         $found = 0;
                         foreach ($tables as $key => $table) {
                             try {
-                                if (! $db->tableExists($key)) {
-                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', false, false);
+                                if (! $db->tableExists($key, false)) {
+                                    $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', false, false, false);
                                     $success += 1;
                                 } else {
                                     $found += 1;

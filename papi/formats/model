@@ -2,13 +2,13 @@
 
 namespace Models;
 
-use Papi\Models\BaseModel;
+use Papi\BaseModel;
 
 class TempModel extends BaseModel
 {
     private $table = 'TempDatabaseName';
 
-    private function __construct()
+    public function __construct()
     {
         parent::__construct($this->table);
     }

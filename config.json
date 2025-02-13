@@ -1,6 +1,6 @@
 {
     "tables": {
-        "users" : {
+        "users": {
             "columns": [
                 {
                     "name" : "id",
@@ -28,15 +28,14 @@
                     "null" : false
                 },
                 {
-                    "name" : "admin",
-                    "type" : "TINYINT",
-                    "null" : false,
-                    "default" : "0"
+                    "name" : "role_id",
+                    "type" : "INT",
+                    "null" : false
                 }
             ],
             "pk": "id"
         },
-        "tokens" : {
+        "tokens": {
             "columns": [
                 {
                     "name" : "id",
@@ -60,6 +59,55 @@
                 }
             ],
             "pk": "id"
+        },
+        "permissions": {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                },
+                {
+                    "name" : "login",
+                    "type" : "TINYINT",
+                    "null" : false
+                }
+            ],
+            "pk": "id"
+        },
+        "roles": {
+            "columns": [
+                {
+                    "name" : "id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "name",
+                    "type" : "TEXT",
+                    "null" : false
+                }
+            ], 
+            "pk": "id"
+        },
+        "roles_with_permissions": {
+            "columns": [
+                {
+                    "name" : "role_id",
+                    "type" : "INT",
+                    "null" : false
+                },
+                {
+                    "name" : "permission_id",
+                    "type" : "INT",
+                    "null" : false
+                }
+            ]
         },
         "inventories": {
             "columns" : [
@@ -96,5 +144,68 @@
             ],
             "pk": "id"
         }
-    }
+    },
+    "permissions": [
+        {
+            "name" : "view",
+            "login" : false
+        },
+        {
+            "name" : "update",
+            "login" : true
+        },
+        {
+            "name" : "create",
+            "login" : true
+        },
+        {
+            "name" : "delete",
+            "login" : true
+        },
+        {
+            "name" : "admin_create",
+            "login" : true
+        },
+        {
+            "name" : "admin_update",
+            "login" : true
+        },
+        {
+            "name" : "admin_view",
+            "login" : true
+        },
+        {
+            "name" : "admin_delete",
+            "login" : true
+        }
+    ],
+    "roles": [
+        {
+            "name": "super admin",
+            "permissions":{
+                "include": [
+                    "*"
+                ]
+            }
+        },
+        {
+            "name": "admin",
+            "permissions":{
+                "include": [
+                    "*"
+                ]
+            }
+        },
+        {
+            "name": "user",
+            "permissions":{
+                "include": [
+                    "view",
+                    "create",
+                    "update",
+                    "delete"
+                ]
+            }
+        }
+    ]
 }
