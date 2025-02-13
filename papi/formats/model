@@ -6,10 +6,5 @@ use Papi\BaseModel;
 
 class TempModel extends BaseModel
 {
-    private $table = 'TempDatabaseName';
-
-    public function __construct()
-    {
-        parent::__construct($this->table);
-    }
+    protected $table = 'TempDatabaseName';
 }
