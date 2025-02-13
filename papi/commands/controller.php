@@ -15,6 +15,8 @@ class Controller
 
             $contents = file_get_contents("controllers/$name.php");
             $contents = str_replace('TempController', ucfirst($name), $contents);
+            $contents = str_replace('Database', str_ends_with(strtolower($name), 'controller') ? substr($name, 0, -10) : $name, $contents);
+            $contents = str_replace('use Papi\\', 'use Models\\', $contents);
             file_put_contents("controllers/$name.php", $contents);
         }
     }
