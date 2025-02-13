@@ -3,12 +3,13 @@
 namespace Papi;
 
 use DateTime;
+use Exception;
 
 abstract class BaseModel extends Database
 {
     protected $table;
 
-    protected $pk;
+    protected $pk = 'id';
 
     /**
      * Check if record with primary key exists,
@@ -18,6 +19,7 @@ abstract class BaseModel extends Database
      */
     protected function insertOrUpdate(array $data, array $conditions = [], bool $checkToken = true)
     {
+        $this->checkTable();
         if ($this->getCount($this->table, $conditions) == 0) {
             return $this->insertInto($this->table, $data, $checkToken);
         } else {
@@ -32,6 +34,8 @@ abstract class BaseModel extends Database
      */
     protected function softDelete(array $conditions = [], bool $checkToken = true)
     {
+        $this->checkTable();
+
         return $this->updateInto($this->table, ['deleted_at', new DateTime], $conditions, $checkToken);
     }
 
@@ -43,6 +47,7 @@ abstract class BaseModel extends Database
      */
     protected function retrieve(array $conditions = [], bool $checkToken = true)
     {
+        $this->checkTable();
         if (! array_key_exists('deleted_at', $conditions)) {
             array_push($conditions, [
                 'col' => 'deleted_at',
@@ -52,5 +57,23 @@ abstract class BaseModel extends Database
         }
 
         return $this->view($this->table, $conditions, $checkToken);
+    }
+
+    private function checkTable()
+    {
+        if (is_null($this->table)) {
+            $className = debug_backtrace(2)[1]['class'];
+            $className = explode('\\', $className);
+            $className = $this->pluralise($className[1]);
+            if ($this->tableExists($className, false)) {
+                $this->table = $this->tableExists($className, false);
+            } else {
+                throw new Exception("Table not found! Please declare it by doing\nprotected \$table = '[table_name]'.");
+            }
+        } else {
+            if (! $this->tableExists($this->table, false)) {
+                throw new Exception("Table not found! Please declare it by doing\nprotected \$table = '[table_name]'.");
+            }
+        }
     }
 }

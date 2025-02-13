@@ -36,7 +36,7 @@ abstract class Auth extends Database
         $user = $this->viewOne('users', [
             'col' => 'email',
             'operator' => '=',
-            'value' => $email
+            'value' => $email,
         ], false);
         if (password_verify($password, $user['password'])) {
             $id = $user['id'];
