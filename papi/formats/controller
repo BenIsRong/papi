@@ -2,6 +2,8 @@
 
 namespace Controllers;
 
-use Src\Database;
+use Papi\Database;
 
-class Controller extends Database {}
+class TempController extends Database {
+    
+}

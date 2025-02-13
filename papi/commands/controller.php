@@ -11,10 +11,10 @@ class Controller
         }
 
         if (! file_exists("controllers/$name.php")) {
-            copy('src/formats/controller', "controllers/$name.php");
+            copy('papi/formats/controller', "controllers/$name.php");
 
             $contents = file_get_contents("controllers/$name.php");
-            $contents = str_replace('Controller', ucfirst(strtolower($name)), $contents);
+            $contents = str_replace('TempController', ucfirst($name), $contents);
             file_put_contents("controllers/$name.php", $contents);
         }
     }
