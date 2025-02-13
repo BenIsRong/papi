@@ -4,7 +4,7 @@ namespace Papi\Commands;
 
 class Controller
 {
-    public function __construct(string $name, string $model)
+    public function __construct(string $name, ?string $model)
     {
         if (! is_dir('controllers/')) {
             mkdir('controllers');
