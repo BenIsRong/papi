@@ -7,31 +7,6 @@ use Papi\Database;
 class Auth extends Database
 {
     /**
-     * Check if API token exists
-     *
-     * @return bool
-     */
-    // TODO: check if expired or not
-    public function checkToken(string $token = '')
-    {
-        $conn = $this->connectDatabase(false);
-        if ($token == '') {
-            $headers = apache_request_headers();
-            $token = explode(' ', $headers['Authorization']);
-            $token = end($token);
-        }
-
-        $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
-        $conn->close();
-
-        if ($result['num'] > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Register a user into the database
      *
      * @return bool
@@ -93,7 +68,7 @@ class Auth extends Database
     }
 
     /**
-     * Check if user is admin or not
+     * Check if user is an Admin or not
      *
      * @return bool
      */
@@ -109,6 +84,62 @@ class Auth extends Database
         ], true, $token);
 
         return str_contains($role['name'], 'admin') ? true : false;
+    }
+
+    /**
+     * Check if user has given role
+     *
+     * @return bool
+     */
+    public function haveRole(string $token, string $role)
+    {
+        $user = $this->getUserFromToken($token);
+        if (! is_null($user)) {
+            $userRole = $user['role_id'];
+            $res = $this->viewOne('roles', [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $role,
+                ],
+            ], false);
+
+            if (! is_null($res)) {
+                if ($userRole == $res['id']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user has given permission
+     *
+     * @return bool
+     */
+    public function havePermission(string $token, string $permission)
+    {
+        $user = $this->getUserFromToken($token);
+
+        if (! is_null($user)) {
+            $permissions = $this->view('permissions', [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $user['role_id'],
+                ],
+            ], false);
+
+            $permissions = array_map(function ($permission) {
+                return strtolower($permission['name']);
+            }, $permissions);
+
+            return in_array(strtolower($permission), $permissions);
+        }
+
+        return false;
     }
 
     /**
