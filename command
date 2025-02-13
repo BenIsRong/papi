@@ -80,9 +80,9 @@ switch (strtolower($argv[1])) {
                 }
                 break;
             case 'controller': // create controller
-                new CreateController(str_ends_with(strtolower($argv[3]), 'controller') ? $argv[3] : $argv[3].'Controller');
                 $remArgs = array_slice($argv, 4);
                 if (count($remArgs) > 0) {
+                    $model = null;
                     foreach ($remArgs as $arg) {
                         switch (true) {
                             case str_starts_with($arg, '-model') | str_starts_with($arg, '--m'): // include model
@@ -93,13 +93,28 @@ switch (strtolower($argv[1])) {
                                         new CreateModel($arg);
                                         break;
                                     }
+                                    $model = $arg;
                                 }
-                                new CreateModel(str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3]);
+                                $model = str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3];
+                                new CreateModel($model);
                                 break;
+                            case str_starts_with($arg, '-with_model') | str_starts_with($arg, '--wm'):
+                                if (substr_count($arg, '=') == 1) {
+                                    $arg = explode('=', $arg);
+                                    $arg = end($arg);
+                                    if (strlen($arg) > 0) {
+                                        $model = $arg;
+                                    } else {
+                                        if (is_null($model)) {
+                                            $model = str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3];
+                                        }
+                                    }
+                                }
                             default:
                                 break;
                         }
                     }
+                    new CreateController(str_ends_with(strtolower($argv[3]), 'controller') ? $argv[3] : $argv[3].'Controller', $model);
                 }
                 break;
             case 'model': // create model
@@ -113,11 +128,11 @@ switch (strtolower($argv[1])) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
                                     if (strlen($arg) > 0) {
-                                        new CreateController($arg.'Controller');
+                                        new CreateController($arg.'Controller', $arg);
                                         break;
                                     }
                                 }
-                                new CreateController($argv[3].'Controller');
+                                new CreateController($argv[3].'Controller', $argv[3]);
                                 break;
                             case str_starts_with($arg, '-table') | str_starts_with($arg, '--t'): // include table
                                 if (substr_count($arg, '=') == 1) {
