@@ -4,18 +4,11 @@ namespace Papi;
 
 use DateTime;
 
-class BaseModel extends Database
+abstract class BaseModel extends Database
 {
-    private $table;
+    protected $table;
 
-    private $pk;
-
-    public function __construct(string $table, string $pk = 'id')
-    {
-        $this->table = $table;
-        $this->pk = $pk;
-
-    }
+    protected $pk;
 
     /**
      * Check if record with primary key exists,
@@ -23,7 +16,7 @@ class BaseModel extends Database
      *
      * @return mixed
      */
-    public function insertOrUpdate(array $data, array $conditions = [], bool $checkToken = true)
+    protected function insertOrUpdate(array $data, array $conditions = [], bool $checkToken = true)
     {
         if ($this->getCount($this->table, $conditions) == 0) {
             return $this->insertInto($this->table, $data, $checkToken);
@@ -37,7 +30,7 @@ class BaseModel extends Database
      *
      * @return mixed
      */
-    public function softDelete(array $conditions = [], bool $checkToken = true)
+    protected function softDelete(array $conditions = [], bool $checkToken = true)
     {
         return $this->updateInto($this->table, ['deleted_at', new DateTime], $conditions, $checkToken);
     }
@@ -48,7 +41,7 @@ class BaseModel extends Database
      *
      * @return mixed
      */
-    public function retrieve(array $conditions = [], bool $checkToken = true)
+    protected function retrieve(array $conditions = [], bool $checkToken = true)
     {
         if (! array_key_exists('deleted_at', $conditions)) {
             array_push($conditions, [

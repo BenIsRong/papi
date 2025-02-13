@@ -4,14 +4,14 @@ namespace Papi;
 
 use mysqli;
 
-class Database extends Base
+abstract class Database extends Base
 {
     /**
      * Connect to database
      *
      * @return mixed
      */
-    public function connectDatabase(bool $withToken = true, string $token = '')
+    private function connectDatabase(bool $withToken = true, string $token = '')
     {
         $env = parse_ini_file('.env');
 

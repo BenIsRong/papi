@@ -4,6 +4,4 @@ namespace Controllers;
 
 use Papi\Database;
 
-class TempController extends Database {
-    
-}
+class TempController extends Database {}
