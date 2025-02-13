@@ -31,12 +31,6 @@
                     "name" : "role_id",
                     "type" : "INT",
                     "null" : false
-                },
-                {
-                    "name" : "admin",
-                    "type" : "TINYINT",
-                    "null" : false,
-                    "default" : "0"
                 }
             ],
             "pk": "id"

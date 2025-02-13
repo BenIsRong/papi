@@ -12,12 +12,14 @@ class Auth extends Database
      * @return bool
      */
     // TODO: check if expired or not
-    public function checkToken()
+    public function checkToken(string $token = '')
     {
         $conn = $this->connectDatabase(false);
-        $headers = apache_request_headers();
-        $token = explode(' ', $headers['Authorization']);
-        $token = end($token);
+        if ($token == '') {
+            $headers = apache_request_headers();
+            $token = explode(' ', $headers['Authorization']);
+            $token = end($token);
+        }
 
         $result = $conn->query("SELECT COUNT(*) as num FROM tokens WHERE token='$token'")->fetch_assoc();
         $conn->close();
@@ -34,7 +36,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    public function register(string $name, string $username, string $email, string $password, bool $admin, int $role)
+    public function register(string $name, string $username, string $email, string $password, int $role)
     {
         if ($this->validateEmail($email)) {
             return $this->insertInto('users', [
@@ -42,7 +44,6 @@ class Auth extends Database
                 'username' => $username,
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_BCRYPT),
-                'admin' => $admin,
                 'role_id' => $role,
             ], false);
         } else {
@@ -52,20 +53,36 @@ class Auth extends Database
 
     /**
      * Register a token to user based on credentials
+     *
+     * @return mixed
      */
     public function registerToken(string $email, string $password)
     {
         $conn = $this->connectDatabase(false);
-        $result = $conn->query("SELECT id,password from users WHERE email='$email'")->fetch_assoc();
-        if (password_verify($password, $result['password'])) {
-            $id = $result['id'];
+        $user = $conn->query("SELECT id,password from users WHERE email='$email'")->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            $id = $user['id'];
             $uuid = $this->uuid();
             $expiry = date('Y-m-d', strtotime('+1 month', strtotime(date('Y-m-d'))));
-            $this->insertInto('tokens', [
-                'user_id' => $id,
-                'token' => $uuid,
-                'expiration' => $expiry,
-            ], false);
+            if ($this->getCount('tokens', [['col' => 'user_id', 'operator' => '=', 'value' => $id]], false) == 0) {
+                $this->insertInto('tokens', [
+                    'user_id' => $id,
+                    'token' => $uuid,
+                    'expiration' => $expiry,
+                ], false);
+            } else {
+                $this->updateInto('tokens', [
+                    'user_id' => $id,
+                    'token' => $uuid,
+                    'expiration' => $expiry,
+                ], [
+                    [
+                        'col' => 'user_id',
+                        'operator' => '=',
+                        'value' => $id,
+                    ],
+                ], false);
+            }
 
             return $uuid;
         }
@@ -80,16 +97,43 @@ class Auth extends Database
      *
      * @return bool
      */
-    public function isAdmin(string $email, string $password, string $token)
+    public function isAdmin(string $token)
     {
-        $result = $this->viewOne('users', [
+        $user = $this->getUserFromToken($token);
+        $role = $this->viewOne('roles', [
             [
-                'col' => 'email',
+                'col' => 'id',
                 'operator' => '=',
-                'value' => $email,
+                'value' => $user['role_id'],
+            ],
+        ], true, $token);
+
+        return str_contains($role['name'], 'admin') ? true : false;
+    }
+
+    /**
+     * get the User from given Token
+     *
+     * @return array|null
+     */
+    public function getUserFromToken(string $token)
+    {
+        $userId = $this->viewOne('tokens', [
+            [
+                'col' => 'token',
+                'operator' => '=',
+                'value' => $token,
+            ],
+        ], false)['user_id'];
+
+        $user = $this->viewOne('users', [
+            [
+                'col' => 'id',
+                'operator' => '=',
+                'value' => $userId,
             ],
         ], false);
 
-        return $result['admin'];
+        return $user;
     }
 }
