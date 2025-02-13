@@ -150,8 +150,9 @@ switch (strtolower($argv[1])) {
         }
         break;
     case '--h':
+    case 'help':
     case '-help':
-        $helps = $db->jsonToArray('resources/help.json');
+        $helps = $db->jsonToArray('papi/resources/help.json');
         echo 'Commands are usually in the format of: php command [operation] [?-options] [?name]';
         echo "\nBelow is a list of available commands:";
         foreach ($helps['help'] as $help) {
