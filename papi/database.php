@@ -2,6 +2,7 @@
 
 namespace Papi;
 
+use DateTime;
 use mysqli;
 
 define('REQUEST_ALL', 0);
@@ -341,7 +342,18 @@ class Database extends Base
 
             foreach ($data as $key => $value) {
                 if (! is_numeric($value)) {
-                    array_push($vals, "`$key`='$value'");
+                    switch (gettype($value)) {
+                        case 'string':
+                            array_push($vals, "`$key`='$value'");
+                            break;
+                        case 'object':
+                            if ($value instanceof DateTime) {
+                                array_push($vals, "`$key`='".$value->format('Y-m-d H:i:s')."'");
+                            } else {
+                                array_push($vals, "`$key`='".json_encode($value)."'");
+                            }
+                            break;
+                    }
                 } else {
                     array_push($vals, "`$key`=$value");
                 }

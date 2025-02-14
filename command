@@ -11,6 +11,9 @@ use Papi\Database as Database;
 $db = new Database;
 
 switch (strtolower($argv[1])) {
+    case 'dev':
+        exec('php -S localhost:8000 index.php');
+        break;
     case 'init': // init
         new Setup;
         break;
@@ -156,10 +159,10 @@ switch (strtolower($argv[1])) {
                 $routeFile = fread($routeFile, filesize('./papi/cache/routes'));
                 $routeFile = gzuncompress($routeFile);
                 $routes = json_decode($routeFile);
-                foreach($routes as $route){
-                    echo "path: " . $route->path . "\n";
-                    echo "method: " . $route->method . "\n";
-                    echo "controller: " . str_replace("\\", "/", $route->controller[0]) . " | " . $route->controller[1] . "\n";
+                foreach ($routes as $route) {
+                    echo 'path: '.$route->path."\n";
+                    echo 'method: '.$route->method."\n";
+                    echo 'controller: '.str_replace('\\', '/', $route->controller[0]).' | '.$route->controller[1]."\n";
                     echo "=================================================================\n";
                 }
         }

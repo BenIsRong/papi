@@ -43,13 +43,16 @@ class Base extends Validation
      *
      * @return void
      */
-    public function response($responseCode, array $res = [])
+    public function response($responseCode, $res = [])
     {
         if (! is_int($responseCode)) {
             $responseCode = $responseCode->get();
         }
         header('Content-Type: application/json', true, $responseCode);
-        echo json_encode($res);
+        if (strtolower(gettype($res)) != 'array') {
+            $res = ['data' => $res];
+        }
+        echo json_encode((object) $res);
     }
 
     /**
@@ -131,6 +134,14 @@ class Base extends Validation
 
     public function addToCache($cachePath, $data)
     {
+        $dir = str_replace('\\', '/', $cachePath);
+        $dir = explode('/', $dir);
+        $dir = array_slice($dir, 0, -1);
+        $dir = implode('/', $dir);
+        if (! is_dir($dir)) {
+            mkdir($dir);
+        }
+
         if (! file_exists($cachePath)) {
             fopen($cachePath, 'w');
         }
