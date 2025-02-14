@@ -4,7 +4,7 @@ namespace Papi\Auth;
 
 use Papi\Database;
 
-class Auth extends Database
+abstract class Auth extends Database
 {
     /**
      * Register a user into the database
@@ -33,8 +33,11 @@ class Auth extends Database
      */
     public function registerToken(string $email, string $password)
     {
-        $conn = $this->connectDatabase(false);
-        $user = $conn->query("SELECT id,password from users WHERE email='$email'")->fetch_assoc();
+        $user = $this->viewOne('users', [
+            'col' => 'email',
+            'operator' => '=',
+            'value' => $email,
+        ], false);
         if (password_verify($password, $user['password'])) {
             $id = $user['id'];
             $uuid = $this->uuid();
@@ -61,8 +64,6 @@ class Auth extends Database
 
             return $uuid;
         }
-
-        $conn->close();
 
         return false;
     }

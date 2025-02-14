@@ -9,7 +9,7 @@ class Validation
      *
      * @return bool
      */
-    public function validateEmail(string $email)
+    protected function validateEmail(string $email)
     {
         return ! filter_var($email, FILTER_VALIDATE_EMAIL) ? false : true;
     }

@@ -3,18 +3,26 @@
 namespace Papi;
 
 use DateTime;
+use Exception;
 
-class BaseModel extends Database
+abstract class BaseModel extends Database
 {
-    private $table;
+    protected $table;
 
-    private $pk;
+    protected $pk = 'id';
 
-    public function __construct(string $table, string $pk = 'id')
+    protected $softDelete = false;
+
+    /**
+     * Insert into table based on given params
+     *
+     * @return mixed
+     */
+    protected function create(array $data, bool $checkToken = true)
     {
-        $this->table = $table;
-        $this->pk = $pk;
+        $this->checkTable();
 
+        return $this->insertInto($this->table, $data, $checkToken);
     }
 
     /**
@@ -23,8 +31,9 @@ class BaseModel extends Database
      *
      * @return mixed
      */
-    public function insertOrUpdate(array $data, array $conditions = [], bool $checkToken = true)
+    protected function createOrUpdate(array $data, array $conditions = [], bool $checkToken = true)
     {
+        $this->checkTable();
         if ($this->getCount($this->table, $conditions) == 0) {
             return $this->insertInto($this->table, $data, $checkToken);
         } else {
@@ -33,13 +42,23 @@ class BaseModel extends Database
     }
 
     /**
-     * Soft deletes the record, such that it still exists, but would not be brought up in queries
+     * Retrieve one row based on condition
+     * Results excludes soft deletes as they are "deleted"
      *
      * @return mixed
      */
-    public function softDelete(array $conditions = [], bool $checkToken = true)
+    protected function getOne(array $conditions = [], bool $checkToken = true)
     {
-        return $this->updateInto($this->table, ['deleted_at', new DateTime], $conditions, $checkToken);
+        $this->checkTable();
+        if (! array_key_exists('deleted_at', $conditions)) {
+            array_push($conditions, [
+                'col' => 'deleted_at',
+                'operator' => '=',
+                'value' => 'NULL',
+            ]);
+        }
+
+        return $this->viewOne($this->table, $conditions, $checkToken);
     }
 
     /**
@@ -48,8 +67,9 @@ class BaseModel extends Database
      *
      * @return mixed
      */
-    public function retrieve(array $conditions = [], bool $checkToken = true)
+    protected function getAll(array $conditions = [], bool $checkToken = true)
     {
+        $this->checkTable();
         if (! array_key_exists('deleted_at', $conditions)) {
             array_push($conditions, [
                 'col' => 'deleted_at',
@@ -59,5 +79,69 @@ class BaseModel extends Database
         }
 
         return $this->view($this->table, $conditions, $checkToken);
+    }
+
+    /**
+     * Update row based on condition
+     *
+     * @return mixed
+     */
+    protected function update(array $data, array $conditions = [], bool $checkToken = true)
+    {
+        $this->checkTable();
+        $this->updateInto($this->table, $data, $conditions, $checkToken);
+    }
+
+    /**
+     * Deletes the record
+     * Depending on $softDelete, it will either do a soft delete or total removal
+     *
+     * @return mixed
+     */
+    protected function delete(array $conditions = [], bool $checkToken = true)
+    {
+        $this->checkTable();
+
+        if ($this->softDelete) {
+            return $this->updateInto($this->table, ['deleted_at', new DateTime], $conditions, $checkToken);
+        } else {
+            return $this->deleteFrom($this->table, $conditions, $checkToken);
+        }
+
+    }
+
+    /**
+     * Deletes all the records, no soft resets because it's meant to clear all
+     *
+     * @return mixed
+     */
+    public function clear(bool $checkToken = true)
+    {
+        $this->checkTable();
+        $this->deleteAll($this->table, $checkToken);
+    }
+
+    /**
+     * Checks if $table has been set, if no, it will try to
+     * If all else fails, it throws an exception and... idk gives up i guess kinda like life eh
+     *
+     * @return void
+     */
+    private function checkTable()
+    {
+        if (is_null($this->table)) {
+            $className = debug_backtrace(2)[1]['class'];
+            $className = explode('\\', $className);
+            $className = $this->pluralise($className[1]);
+            if ($this->tableExists($className, false)) {
+                $this->table = $this->tableExists($className, false);
+            } else {
+                throw new Exception("Table not found! Please declare it by doing\nprotected \$table = '[table_name]'.");
+            }
+        } else {
+            if (! $this->tableExists($this->table, false)) {
+                throw new Exception("Table not found! Please declare it by doing\nprotected \$table = '[table_name]'.");
+            }
+        }
     }
 }

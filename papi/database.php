@@ -11,7 +11,7 @@ class Database extends Base
      *
      * @return mixed
      */
-    public function connectDatabase(bool $withToken = true, string $token = '')
+    private function connectDatabase(bool $withToken = true, string $token = '')
     {
         $env = parse_ini_file('.env');
 

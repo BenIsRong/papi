@@ -3,6 +3,6 @@
 vendor/
 composer.json
 composer.lock
-api/
 models/
 controllers/
+papi/resources/models.json
