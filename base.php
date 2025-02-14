@@ -9,12 +9,6 @@ spl_autoload_register(function ($class) {
     require_once __DIR__."\\$path.php";
 });
 
-// DEFINITIONS
-// request definitions
-define('REQUEST_ALL', 0);
-define('REQUEST_FORM_ONLY', 1);
-define('REQUEST_PARAMS_ONLY', 2);
-
 class Base extends Validation
 {
     /**

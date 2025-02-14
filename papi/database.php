@@ -4,6 +4,10 @@ namespace Papi;
 
 use mysqli;
 
+define('REQUEST_ALL', 0);
+define('REQUEST_FORM_ONLY', 1);
+define('REQUEST_PARAMS_ONLY', 2);
+
 class Database extends Base
 {
     /**
