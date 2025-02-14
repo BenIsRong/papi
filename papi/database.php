@@ -231,17 +231,6 @@ class Database extends Base
     }
 
     /**
-     * Generate an HTTP response
-     *
-     * @return void
-     */
-    public function response(int $responseCode, array $res = [])
-    {
-        http_response_code($responseCode);
-        echo json_encode($res);
-    }
-
-    /**
      * Check if table exists in database
      *
      * @return bool

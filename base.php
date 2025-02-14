@@ -10,6 +10,7 @@ spl_autoload_register(function ($class) {
 });
 
 // DEFINITIONS
+// request definitions
 define('REQUEST_ALL', 0);
 define('REQUEST_FORM_ONLY', 1);
 define('REQUEST_PARAMS_ONLY', 2);
@@ -41,6 +42,20 @@ class Base extends Validation
 
         return $answer;
 
+    }
+
+    /**
+     * Generate an HTTP response
+     *
+     * @return void
+     */
+    public function response($responseCode, array $res = [])
+    {
+        if (! is_int($responseCode)) {
+            $responseCode = $responseCode->get();
+        }
+        header('Content-Type: application/json', true, $responseCode);
+        echo json_encode($res);
     }
 
     /**
