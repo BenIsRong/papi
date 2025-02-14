@@ -6,6 +6,8 @@ use Papi\Database;
 
 class Auth extends Database
 {
+    private $table = 'users';
+
     /**
      * Register a user into the database
      *
@@ -13,8 +15,8 @@ class Auth extends Database
      */
     public function register(string $name, string $username, string $email, string $password, int $role)
     {
-        if ($this->validateEmail($email)) {
-            return $this->insertInto('users', [
+        if ($this->validateEmail($email) && $this->validatePassword($password)) {
+            return $this->insertInto($this->table, [
                 'name' => $name,
                 'username' => $username,
                 'email' => $email,
@@ -27,13 +29,114 @@ class Auth extends Database
     }
 
     /**
+     * Update a user's name and username
+     *
+     * @return bool
+     */
+    public function updateNames(?string $name, ?string $username, string $token)
+    {
+        $user = $this->getUserFromToken($token);
+        if (! is_null($user)) {
+            $this->updateInto($this->table, [
+                'name' => $name ?? $user['name'],
+                'username' => $username ?? $user['username'],
+            ], [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $user['id'],
+                ],
+            ], true, $token);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Update a user's email
+     *
+     * @return bool
+     */
+    public function updateEmail(string $email, string $token)
+    {
+        $user = $this->getUserFromToken($token);
+        if (! is_null($user) && $this->validateEmail($email)) {
+            $this->updateInto($this->table, [
+                'email' => $email,
+            ], [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $user['id'],
+                ],
+            ], true, $token);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Update a user's password
+     *
+     * @return bool
+     */
+    public function updatePassword(string $oldPassword, string $newPassword, string $token)
+    {
+        $user = $this->getUserFromToken($token);
+        if (! is_null($user) && password_verify($oldPassword, $user['password']) && $this->validatePassword($newPassword)) {
+            $this->updateInto($this->table, [
+                'password' => password_hash($newPassword, PASSWORD_BCRYPT),
+            ], [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $user['id'],
+                ],
+            ], true, $token);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Update a user's role
+     *
+     * @return bool
+     */
+    public function updateRole(int $role, string $token)
+    {
+        $user = $this->getUserFromToken($token);
+        if (! is_null($user)) {
+            $this->updateInto($this->table, [
+                'role_id' => $role,
+            ], [
+                [
+                    'col' => 'id',
+                    'operator' => '=',
+                    'value' => $user['id'],
+                ],
+            ], true, $token);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Register a token to user based on credentials
      *
      * @return mixed
      */
     public function registerToken(string $email, string $password)
     {
-        $user = $this->viewOne('users', [
+        $user = $this->viewOne($this->table, [
             'col' => 'email',
             'operator' => '=',
             'value' => $email,
@@ -158,7 +261,7 @@ class Auth extends Database
             ],
         ], false)['user_id'];
 
-        $user = $this->viewOne('users', [
+        $user = $this->viewOne($this->table, [
             [
                 'col' => 'id',
                 'operator' => '=',
