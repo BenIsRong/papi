@@ -39,11 +39,12 @@ class Router
     public function addCRUD(string $item, string $controller)
     {
         $cruds = [
-            'create' => 'POST',
-            'read' => 'GET',
-            'index' => 'GET',
-            'update' => 'PUT',
-            'delete' => 'DELETE',
+            'createRecord' => 'POST',
+            'readRecord' => 'GET',
+            'readAllRecords' => 'GET',
+            'updateRecord' => 'PUT',
+            'deleteRecord' => 'DELETE',
+            'clearAll' => 'DELETE',
         ];
 
         foreach ($cruds as $crud => $method) {
