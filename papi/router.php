@@ -28,6 +28,22 @@ class Router
         }
 
         foreach ($this->routes as $route) {
+            if (preg_match('/{(.*?)}/', $route['path'], $matches)) {
+                $explodedRoute = explode('/', $route['path']);
+                $explodedPath = explode('/', $path);
+                $routePos = array_search($matches[0], $explodedRoute);
+                $pathValue = $explodedPath[$routePos];
+                unset($explodedRoute[$routePos]);
+                unset($explodedPath[$routePos]);
+                $implodeRoute = implode('/', $explodedRoute);
+                $implodePath = implode('/', $explodedPath);
+
+                if ($implodePath == $implodeRoute && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
+                    [$class, $function] = $route['controller'];
+                    $controllerInstance = new $class;
+                    $controllerInstance->$function($pathValue);
+                }
+            }
             if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                 [$class, $function] = $route['controller'];
                 $controllerInstance = new $class;
