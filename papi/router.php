@@ -36,7 +36,7 @@ class Router
         }
     }
 
-    public function addCRUD(string $item, string $controller)
+    public function addCRUD(string $model, string $controller)
     {
         $cruds = [
             'createRecord' => 'POST',
@@ -48,7 +48,10 @@ class Router
         ];
 
         foreach ($cruds as $crud => $method) {
-            $path = '/papi/api/'.$item;
+            $model = strtolower($model);
+            $model = str_contains($model, '\\') ? explode('\\', $model) : explode('//', $model);
+            $model = end($model);
+            $path = '/papi/api/'.$model;
 
             array_push($this->routes, [
                 'path' => $crud == 'index' ? $path.'/all/' : $path.'/',
@@ -60,10 +63,10 @@ class Router
 
     public function listRoutes()
     {
-        echo 'The routes are: ';
+        echo 'The routes are: '."\n";
 
         foreach ($this->routes as $route) {
-            echo '<br />'.$route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1];
+            echo $route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1]."\n";
         }
     }
 }

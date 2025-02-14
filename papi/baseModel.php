@@ -111,6 +111,27 @@ abstract class BaseModel extends Database
     }
 
     /**
+     * Get request data either through form and/or params
+     * Each of the key has to be different
+     *
+     * @return array
+     */
+    protected function request(int $options = REQUEST_ALL)
+    {
+        switch ($options) {
+            case REQUEST_ALL:
+                return array_merge($_POST, $_GET);
+                break;
+            case REQUEST_FORM_ONLY:
+                return $_POST;
+                break;
+            case REQUEST_PARAMS_ONLY:
+                return $_GET;
+                break;
+        }
+    }
+
+    /**
      * Deletes all the records, no soft resets because it's meant to clear all
      *
      * @return mixed
