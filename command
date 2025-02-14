@@ -11,6 +11,9 @@ use Papi\Database as Database;
 $db = new Database;
 
 switch (strtolower($argv[1])) {
+    case 'dev':
+        exec("php -S localhost:8000 index.php");
+        break;
     case 'init': // init
         new Setup;
         break;

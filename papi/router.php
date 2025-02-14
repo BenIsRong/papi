@@ -8,6 +8,13 @@ class Router extends Base
 
     private string $cachePath = __DIR__.'/cache/routes';
 
+    public function __construct()
+    {
+        if (file_exists($this->cachePath)) {
+            unlink($this->cachePath);
+        }
+    }
+
     public function add(string $method, string $path, array $controller)
     {
         if (substr($path, -1) != '/') {

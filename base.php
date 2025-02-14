@@ -131,6 +131,14 @@ class Base extends Validation
 
     public function addToCache($cachePath, $data)
     {
+        $dir = str_replace("\\", "/", $cachePath);
+        $dir = explode('/', $dir);
+        $dir = array_slice($dir, 0, -1);
+        $dir = implode("/", $dir);
+        if (! is_dir($dir)) {
+            mkdir($dir);
+        }
+
         if (! file_exists($cachePath)) {
             fopen($cachePath, 'w');
         }

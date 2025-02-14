@@ -6,3 +6,4 @@ composer.lock
 models/
 controllers/
 papi/resources/models.json
+cache/

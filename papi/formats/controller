@@ -17,7 +17,7 @@ class TempController extends Database
     /**
      * This function is for you to read your records
      */
-    public function readRecord()
+    public function readRecord($id)
     {
         // your code goes here
     }
@@ -33,7 +33,7 @@ class TempController extends Database
     /**
      * This function is for you to update your records
      */
-    public function updateRecord()
+    public function updateRecord($id)
     {
         // your code goes here
     }
@@ -41,7 +41,7 @@ class TempController extends Database
     /**
      * This function is for you to delete your records
      */
-    public function deleteRecord()
+    public function deleteRecord($id)
     {
         // your code goes here
     }
