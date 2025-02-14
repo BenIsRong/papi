@@ -51,7 +51,7 @@ class Router
             $model = strtolower($model);
             $model = str_contains($model, '\\') ? explode('\\', $model) : explode('//', $model);
             $model = end($model);
-            $path = '/papi/api/'.$model;
+            $path = '/papi/api/'.$model.($crud == 'readAllRecords' ? '' : '/{id}');
 
             array_push($this->routes, [
                 'path' => $crud == 'index' ? $path.'/all/' : $path.'/',

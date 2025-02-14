@@ -4,7 +4,7 @@ namespace Papi\Auth;
 
 use Papi\Database;
 
-abstract class Auth extends Database
+class Auth extends Database
 {
     /**
      * Register a user into the database
@@ -167,5 +167,31 @@ abstract class Auth extends Database
         ], false);
 
         return $user;
+    }
+
+    /**
+     * Get user role id
+     *
+     * @return int|null
+     */
+    public function getRoleIdofUser(string $token)
+    {
+        $user = $this->getUserFromToken($token);
+
+        return $user['role_id'];
+    }
+
+    /**
+     * Get token of Request
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        $headers = apache_request_headers();
+        $token = explode(' ', $headers['Authorization']);
+        $token = end($token);
+
+        return $token;
     }
 }

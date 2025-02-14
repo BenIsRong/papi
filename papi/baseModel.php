@@ -50,12 +50,14 @@ abstract class BaseModel extends Database
     protected function getOne(array $conditions = [], bool $checkToken = true)
     {
         $this->checkTable();
-        if (! array_key_exists('deleted_at', $conditions)) {
-            array_push($conditions, [
-                'col' => 'deleted_at',
-                'operator' => '=',
-                'value' => 'NULL',
-            ]);
+        if ($this->columnExists($this->table, 'deleted_at')) {
+            if (! array_key_exists('deleted_at', $conditions)) {
+                array_push($conditions, [
+                    'col' => 'deleted_at',
+                    'operator' => '=',
+                    'value' => 'NULL',
+                ]);
+            }
         }
 
         return $this->viewOne($this->table, $conditions, $checkToken);
@@ -70,12 +72,14 @@ abstract class BaseModel extends Database
     protected function getAll(array $conditions = [], bool $checkToken = true)
     {
         $this->checkTable();
-        if (! array_key_exists('deleted_at', $conditions)) {
-            array_push($conditions, [
-                'col' => 'deleted_at',
-                'operator' => '=',
-                'value' => 'NULL',
-            ]);
+        if ($this->columnExists($this->table, 'deleted_at')) {
+            if (! array_key_exists('deleted_at', $conditions)) {
+                array_push($conditions, [
+                    'col' => 'deleted_at',
+                    'operator' => '=',
+                    'value' => 'NULL',
+                ]);
+            }
         }
 
         return $this->view($this->table, $conditions, $checkToken);

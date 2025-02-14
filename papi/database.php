@@ -255,6 +255,20 @@ class Database extends Base
         return mysqli_num_rows($result) == 1;
     }
 
+    public function columnExists(string $table, string $column, bool $checkToken = true, string $token = '')
+    {
+        $conn = $this->connectDatabase($checkToken, $token);
+        $result = $conn->query("SHOW COLUMNS FROM $table");
+
+        while ($row = $result->fetch_assoc()) {
+            if ($row['Field'] == $column) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check if API token exists
      *
