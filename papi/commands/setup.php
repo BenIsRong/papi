@@ -39,7 +39,9 @@ class Setup extends Auth
                         do {
                             $email = $this->io('Email');
                         } while (! $this->validateEmail($email));
-                        $password = $this->io('Password');
+                        do {
+                            $password = $this->io('Password');
+                        } while (! $this->validatePassword($password));
                         $this->register($name, $username, $email, $password, $adminRoleId);
                         $uuid = $this->registerToken($email, $password);
                         echo 'User created with token '.$uuid;

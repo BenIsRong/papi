@@ -15,7 +15,7 @@ class Auth extends Database
      */
     public function register(string $name, string $username, string $email, string $password, int $role)
     {
-        if ($this->validateEmail($email)) {
+        if ($this->validateEmail($email) && $this->validatePassword($password)) {
             return $this->insertInto($this->table, [
                 'name' => $name,
                 'username' => $username,
@@ -87,7 +87,7 @@ class Auth extends Database
     public function updatePassword(string $oldPassword, string $newPassword, string $token)
     {
         $user = $this->getUserFromToken($token);
-        if (! is_null($user) && password_verify($oldPassword, $user['password'])) {
+        if (! is_null($user) && password_verify($oldPassword, $user['password']) && $this->validatePassword($newPassword)) {
             $this->updateInto($this->table, [
                 'password' => password_hash($newPassword, PASSWORD_BCRYPT),
             ], [
