@@ -12,7 +12,7 @@ class Router
             $path = $path.'/';
         }
 
-        $path = '/papi/api/'.$path;
+        $path = '/papi/api'.(substr($path, 0, 1) == '/' ? '' : '/').$path;
 
         array_push($this->routes, [
             'path' => $path,
