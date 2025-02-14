@@ -4,7 +4,7 @@ namespace Papi;
 
 use mysqli;
 
-abstract class Database extends Base
+class Database extends Base
 {
     /**
      * Connect to database

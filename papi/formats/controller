@@ -4,4 +4,53 @@ namespace Controllers;
 
 use Papi\Database;
 
-class TempController extends Database {}
+class TempController extends Database
+{
+    /**
+     * This function is for you to create records
+     */
+    public function createRecord()
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to read your records
+     */
+    public function readRecord()
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to read all your records
+     */
+    public function readAllRecords()
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to update your records
+     */
+    public function updateRecord()
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to delete your records
+     */
+    public function deleteRecord()
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to clear your model
+     */
+    public function clearAll()
+    {
+        // your code goes here
+    }
+}

@@ -8,3 +8,6 @@ This started when my in-charge at my workplace asked if I could try to figure ou
 
 ## How is papi?
 papi is still in the very early stages of development! As this is a self-initiated project, I am currently trying to do everything by myself. Maybe, in the future, I hope to expand this such that I can involve more people to help out with this project! I am but a mere dumbass that is trying things out, so things like security are not my forte and will <b>definitely</b> require help from others.
+
+## How to install papi?
+papi can be installed by either cloning or forking the project for now. Make sure that if you use XAMPP, to put it under htdocs, else put it somewhere that is similar to XAMPP's htdocs. And that's it... for now
