@@ -149,6 +149,21 @@ switch (strtolower($argv[1])) {
                 new CreateModel($argv[3], $db);
         }
         break;
+    case 'route':
+        switch (strtolower($argv[2])) {
+            case 'list':
+                $routeFile = fopen('./papi/cache/routes', 'r');
+                $routeFile = fread($routeFile, filesize('./papi/cache/routes'));
+                $routeFile = gzuncompress($routeFile);
+                $routes = json_decode($routeFile);
+                foreach($routes as $route){
+                    echo "path: " . $route->path . "\n";
+                    echo "method: " . $route->method . "\n";
+                    echo "controller: " . str_replace("\\", "/", $route->controller[0]) . " | " . $route->controller[1] . "\n";
+                    echo "=================================================================\n";
+                }
+        }
+        break;
     case '--h':
     case 'help':
     case '-help':

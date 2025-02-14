@@ -2,9 +2,11 @@
 
 namespace Papi;
 
-class Router
+class Router extends Base
 {
     private array $routes = [];
+
+    private string $cachePath = __DIR__.'/cache/routes';
 
     public function add(string $method, string $path, array $controller)
     {
@@ -19,6 +21,9 @@ class Router
             'method' => $method,
             'controller' => $controller,
         ]);
+
+        $this->addToCache($this->cachePath, $this->routes);
+
     }
 
     public function dispatch(string $path)
@@ -63,11 +68,17 @@ class Router
             'clearAll' => 'DELETE',
         ];
 
+        $nonIds = [
+            'createRecord',
+            'readAllRecords',
+            'clearAll',
+        ];
+
         foreach ($cruds as $crud => $method) {
             $model = strtolower($model);
             $model = str_contains($model, '\\') ? explode('\\', $model) : explode('//', $model);
             $model = end($model);
-            $path = '/papi/api/'.$model.($crud == 'readAllRecords' ? '' : '/{id}');
+            $path = '/papi/api/'.$model.(in_array($crud, $nonIds) ? '' : '/{id}');
 
             array_push($this->routes, [
                 'path' => $crud == 'index' ? $path.'/all/' : $path.'/',
@@ -75,14 +86,22 @@ class Router
                 'controller' => [$controller, $crud],
             ]);
         }
+        $this->addToCache($this->cachePath, $this->routes);
     }
 
     public function listRoutes()
     {
         echo 'The routes are: '."\n";
 
-        foreach ($this->routes as $route) {
-            echo $route['path'].' ('.$route['method'].')'.' | '.$route['controller'][0].', '.$route['controller'][1]."\n";
+        $routeFile = fopen($this->cachePath, 'r');
+        $routeFile = fread($routeFile, filesize($this->cachePath));
+        $routeFile = gzuncompress($routeFile);
+        $routes = json_decode($routeFile);
+        foreach ($routes as $route) {
+            echo 'path: '.$route->path."\n";
+            echo 'method: '.$route->method."\n";
+            echo 'controller: '.$route->controller[0].' | '.$route->controller[1]."\n";
+            echo "=================================================================\n";
         }
     }
 }

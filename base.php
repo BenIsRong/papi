@@ -128,4 +128,12 @@ class Base extends Validation
 
         return $lower ? strtolower($name) : $name;
     }
+
+    public function addToCache($cachePath, $data)
+    {
+        if (! file_exists($cachePath)) {
+            fopen($cachePath, 'w');
+        }
+        file_put_contents($cachePath, gzcompress(json_encode($data)));
+    }
 }
