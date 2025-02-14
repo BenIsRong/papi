@@ -9,7 +9,7 @@ class TempController extends Database
     /**
      * This function is for you to create records
      */
-    public function createRecord()
+    public function createRecord($request)
     {
         // your code goes here
     }
@@ -17,7 +17,7 @@ class TempController extends Database
     /**
      * This function is for you to read your records
      */
-    public function readRecord($id)
+    public function readRecord($request, $id)
     {
         // your code goes here
     }
@@ -25,7 +25,7 @@ class TempController extends Database
     /**
      * This function is for you to read all your records
      */
-    public function readAllRecords()
+    public function readAllRecords($request)
     {
         // your code goes here
     }
@@ -33,7 +33,7 @@ class TempController extends Database
     /**
      * This function is for you to update your records
      */
-    public function updateRecord($id)
+    public function updateRecord($request, $id)
     {
         // your code goes here
     }
@@ -41,7 +41,7 @@ class TempController extends Database
     /**
      * This function is for you to delete your records
      */
-    public function deleteRecord($id)
+    public function deleteRecord($request, $id)
     {
         // your code goes here
     }
@@ -49,7 +49,7 @@ class TempController extends Database
     /**
      * This function is for you to clear your model
      */
-    public function clearAll()
+    public function clearAll($request)
     {
         // your code goes here
     }

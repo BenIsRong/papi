@@ -53,13 +53,13 @@ class Router extends Base
                 if ($implodePath == $implodeRoute && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                     [$class, $function] = $route['controller'];
                     $controllerInstance = new $class;
-                    $controllerInstance->$function($pathValue);
+                    $controllerInstance->$function($this->request(), $pathValue);
                 }
             }
             if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                 [$class, $function] = $route['controller'];
                 $controllerInstance = new $class;
-                $controllerInstance->$function();
+                $controllerInstance->$function($this->request());
             }
         }
     }
@@ -109,6 +109,27 @@ class Router extends Base
             echo 'method: '.$route->method."\n";
             echo 'controller: '.$route->controller[0].' | '.$route->controller[1]."\n";
             echo "=================================================================\n";
+        }
+    }
+
+    /**
+     * Get request data either through form and/or params
+     * Each of the key has to be different
+     *
+     * @return array
+     */
+    private function request(int $options = REQUEST_ALL)
+    {
+        switch ($options) {
+            case REQUEST_ALL:
+                return array_merge($_POST, $_GET);
+                break;
+            case REQUEST_FORM_ONLY:
+                return $_POST;
+                break;
+            case REQUEST_PARAMS_ONLY:
+                return $_GET;
+                break;
         }
     }
 }
