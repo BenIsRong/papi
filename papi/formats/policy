@@ -1,0 +1,86 @@
+<?php
+
+namespace Policies;
+
+use Papi\Auth\Perms;
+
+class TempPolicy
+{
+    /**
+     *  // This is an example function for a policy
+     * public function Example(string $token)
+     * {
+     *     if (Perms::haveRole($token, 'admin')) {
+     *         return Perms::havePermission($token, 'test_permission');
+     *     }
+     * 
+     *     return false;
+     * }
+     */
+
+    /**
+     * This function is for you to set the policy of
+     * the createRecord function in your controller
+     *
+     * @return bool
+     */
+    public function createRecord(string $token)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set the policy of
+     * the readRecord function in your controller
+     *
+     * @return bool
+     */
+    public function readRecord(string $token)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set the policy of
+     * the readAllRecords function in your controller
+     *
+     * @return bool
+     */
+    public function readAllRecords(string $token)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set the policy of
+     * the updateRecord function in your controller
+     *
+     * @return bool
+     */
+    public function updateRecord(string $token)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set the policy of
+     * the deleteRecord function in your controller
+     *
+     * @return bool
+     */
+    public function deleteRecord(string $token)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set the policy of
+     * the clearAll function in your controller
+     *
+     * @return bool
+     */
+    public function clearAll(string $token)
+    {
+        // your code goes here
+    }
+}

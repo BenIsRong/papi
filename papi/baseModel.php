@@ -105,7 +105,6 @@ abstract class BaseModel extends Database
     protected function delete(array $conditions = [], bool $checkToken = true)
     {
         $this->checkTable();
-
         if ($this->softDelete) {
             return $this->updateInto($this->table, ['deleted_at' => new DateTime], $conditions, $checkToken);
         } else {
