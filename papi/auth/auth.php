@@ -11,7 +11,7 @@ class Auth extends Database
     /**
      * Register a user into the database
      *
-     * @return bool
+     * @return array|bool
      */
     public function register(array $request)
     {
@@ -176,6 +176,32 @@ class Auth extends Database
         }
 
         return false;
+    }
+
+    /**
+     * Remove user by user id
+     *
+     * @return bool
+     */
+    public function removeUser($id)
+    {
+        $removeUser = $this->deleteFrom($this->table, [
+            [
+                'col' => 'id',
+                'operator' => '=',
+                'value' => $id,
+            ],
+        ]);
+
+        $removeToken = $this->deleteFrom('tokens', [
+            [
+                'col' => 'user_id',
+                'operator' => '=',
+                'value' => $id,
+            ],
+        ]);
+
+        return ($removeUser == $removeToken) && ($removeUser == true);
     }
 
     /**
