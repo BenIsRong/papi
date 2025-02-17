@@ -6,6 +6,11 @@ use Papi\Database;
 
 class Model extends Database
 {
+    /**
+     * Construct a new model
+     *
+     * @return void
+     */
     public function __construct(string $name, ?string $db = null)
     {
         if (! is_dir('models/')) {

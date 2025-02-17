@@ -59,11 +59,19 @@ class Response
 {
     private $response;
 
+    /**
+     * Default constructor for Response object
+     */
     public function __construct($response)
     {
         $this->response = $response;
     }
 
+    /**
+     * Get the int that corresponds to the defined response
+     *
+     * @return int
+     */
     public function get()
     {
         return $this->response;

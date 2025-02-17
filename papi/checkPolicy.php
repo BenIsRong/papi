@@ -6,6 +6,13 @@ use Exception;
 
 trait CheckPolicy
 {
+    /**
+     * Check if the user is allowed to based on policy
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
     public function allowedTo(string $policy)
     {
         $function = debug_backtrace()[1]['function'];

@@ -13,7 +13,7 @@ class Auth extends Database
      *
      * @return array|bool
      */
-    protected function register(array $request)
+    public function register(array $request)
     {
         if ($this->checkIfAllKeysExists(array_keys($request), ['name', 'username', 'email', 'password', 'role'])) {
             if ($this->validateEmail($request['email']) && $this->validatePassword($request['password']) && ! $this->checkUserExists($request['email'], $request['password'])) {
@@ -40,7 +40,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function updateNames(?string $name, ?string $username, string $token)
+    public function updateNames(?string $name, ?string $username, string $token)
     {
         $user = $this->getUserFromToken($token);
         if (! is_null($user)) {
@@ -66,7 +66,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function updateEmail(string $email, string $token)
+    public function updateEmail(string $email, string $token)
     {
         $user = $this->getUserFromToken($token);
         if (! is_null($user) && $this->validateEmail($email)) {
@@ -91,7 +91,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function updatePassword(string $oldPassword, string $newPassword, string $token)
+    public function updatePassword(string $oldPassword, string $newPassword, string $token)
     {
         $user = $this->getUserFromToken($token);
         if (! is_null($user) && password_verify($oldPassword, $user['password']) && $this->validatePassword($newPassword)) {
@@ -116,7 +116,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function updateRole(int $role, string $token)
+    public function updateRole(int $role, string $token)
     {
         $user = $this->getUserFromToken($token);
         if (! is_null($user)) {
@@ -141,7 +141,7 @@ class Auth extends Database
      *
      * @return mixed
      */
-    protected function registerToken(string $email, string $password)
+    public function registerToken(string $email, string $password)
     {
         $user = $this->viewOne($this->table, [[
             'col' => 'email',
@@ -183,7 +183,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function removeUser($id)
+    public function removeUser($id)
     {
         $removeUser = $this->deleteFrom($this->table, [
             [
@@ -209,7 +209,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function isAdmin(string $token)
+    public function isAdmin(string $token)
     {
         $user = $this->getUserFromToken($token);
         $role = $this->viewOne('roles', [
@@ -228,7 +228,7 @@ class Auth extends Database
      *
      * @return array|null
      */
-    protected function getUserFromToken(string $token)
+    public function getUserFromToken(string $token)
     {
         $userId = $this->viewOne('tokens', [
             [
@@ -254,7 +254,7 @@ class Auth extends Database
      *
      * @return int|null
      */
-    protected function getRoleIdofUser(string $token)
+    public function getRoleIdofUser(string $token)
     {
         $user = $this->getUserFromToken($token);
 
@@ -266,7 +266,7 @@ class Auth extends Database
      *
      * @return string
      */
-    protected function getToken()
+    public function getToken()
     {
         $headers = apache_request_headers();
         $token = explode(' ', $headers['Authorization']);
@@ -280,7 +280,7 @@ class Auth extends Database
      *
      * @return bool
      */
-    protected function checkUserExists(string $email, string $password)
+    public function checkUserExists(string $email, string $password)
     {
         $result = $this->viewOne($this->table, [
             [

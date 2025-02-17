@@ -4,6 +4,11 @@ namespace Papi\Commands;
 
 class Controller
 {
+    /**
+     * Construct a new Controller
+     *
+     * @return void
+     */
     public function __construct(string $name, ?string $model)
     {
         if (! is_dir('controllers/')) {

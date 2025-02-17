@@ -94,6 +94,11 @@ class Base extends Validation
         }
     }
 
+    /**
+     * Get the plural version of a Noun
+     *
+     * @return string
+     */
     public function pluralise(string $name, bool $lower = true)
     {
         switch (true) {
@@ -132,6 +137,11 @@ class Base extends Validation
         return $lower ? strtolower($name) : $name;
     }
 
+    /**
+     * To either add or update caches in the cache folder
+     *
+     * @return void
+     */
     public function addToCache($cachePath, $data)
     {
         $dir = str_replace('\\', '/', $cachePath);
@@ -148,6 +158,11 @@ class Base extends Validation
         file_put_contents($cachePath, gzcompress(json_encode($data)));
     }
 
+    /**
+     * Check if all keys in an array exists based on a given list
+     *
+     * @return bool|array
+     */
     public function checkIfAllKeysExists(array $keys, array $checks)
     {
         $notFound = [];

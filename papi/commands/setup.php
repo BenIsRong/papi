@@ -10,6 +10,9 @@ class Setup extends Auth
 {
     private $conn;
 
+    /**
+     * To initialise the setup by calling the class through __construct
+     */
     public function __construct()
     {
         try {
