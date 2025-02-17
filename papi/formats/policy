@@ -11,7 +11,7 @@ class TempPolicy
      * public function Example(string $token)
      * {
      *     if (Perms::haveRole($token, 'admin')) {
-     *         return Perms::havePermission($token, 'test_permission');
+     *         return Perms::havePermission($token, 'showExample');
      *     }
      * 
      *     return false;

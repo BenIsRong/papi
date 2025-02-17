@@ -3,8 +3,9 @@
 
 require_once './base.php';
 
-use Papi\Commands\Controller as Controller;
-use Papi\Commands\Model as CreateModel;
+use Papi\Commands\Controller;
+use Papi\Commands\Model;
+use Papi\Commands\Policy;
 use Papi\Commands\Setup;
 use Papi\Database as Database;
 
@@ -23,8 +24,8 @@ switch (strtolower($argv[1])) {
                 $tables = $db->jsonToArray('config.json', 'tables');
                 $errors = 0;
                 switch (strtolower($argv[3])) {
-                    case '--a':
-                    case '-all': // create all tables, fail for table if already created
+                    case '-a':
+                    case '--all': // create all tables, fail for table if already created
                         foreach ($tables as $key => $table) {
                             try {
                                 $db->createTable($key, $table['columns'], (array_key_exists('pk', $table)) ? $table['pk'] : '', true, false, false);
@@ -37,8 +38,8 @@ switch (strtolower($argv[1])) {
                         }
                         echo "\nFinished creations of remaining tables with ".$errors.' fails and '.(count($tables) - $errors).' succeeded';
                         break;
-                    case '--r':
-                    case '-restricted': // create specified tables only
+                    case '-r':
+                    case '--restricted': // create specified tables only
                         $names = explode(',', str_replace(' ', '', strtolower($argv[4])));
                         foreach ($names as $name) {
                             if (array_key_exists($name, $tables)) {
@@ -59,8 +60,8 @@ switch (strtolower($argv[1])) {
                         }
                         echo "\nFinished creations of remaining tables with ".$errors.' fails and '.(count($names) - $errors).' succeeded';
                         break;
-                    case '--m':
-                    case '-remaining': // create for remaining tables that have yet to be created
+                    case '-m':
+                    case '--remaining': // create for remaining tables that have yet to be created
                         $success = 0;
                         $found = 0;
                         foreach ($tables as $key => $table) {
@@ -87,23 +88,21 @@ switch (strtolower($argv[1])) {
                 $remArgs = array_slice($argv, 4);
                 if (count($remArgs) > 0) {
                     foreach ($remArgs as $arg) {
-                        echo "arg: ". $arg;
                         switch (true) {
-                            case str_starts_with($arg, '-model') | str_starts_with($arg, '--m'): // include model
+                            case str_starts_with($arg, '--model') | str_starts_with($arg, '-m'): // include model
                                 if (substr_count($arg, '=') == 1) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
                                     if (strlen($arg) > 0) {
-                                        new CreateModel($arg);
+                                        new Model($arg);
                                         break;
                                     }
                                     $model = $arg;
-                                    echo $model;
                                 }
                                 $model = str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3];
-                                new CreateModel($model);
+                                new Model($model);
                                 break;
-                            case str_starts_with($arg, '-with_model') | str_starts_with($arg, '--wm'):
+                            case str_starts_with($arg, '--with_model') | str_starts_with($arg, '-wm'):
                                 if (substr_count($arg, '=') == 1) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
@@ -115,12 +114,21 @@ switch (strtolower($argv[1])) {
                                         }
                                     }
                                 }
+                                break;
+                            case str_starts_with($arg, '--with_policy') | str_starts_with($arg, '-wp'):
+                                if (substr_count($arg, '=') == 1) {
+                                    $arg = explode('=', $arg);
+                                    $arg = end($arg);
+                                } else {
+                                    $arg = str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3];
+                                }
+                                new Policy($arg);
+                                break;
                             default:
                                 break;
                         }
                     }
                 }
-                
                 new Controller(str_ends_with(strtolower($argv[3]), 'controller') ? $argv[3] : $argv[3].'Controller', $model);
                 break;
             case 'model': // create model
@@ -129,7 +137,7 @@ switch (strtolower($argv[1])) {
                 if (count($remArgs) > 0) {
                     foreach ($remArgs as $arg) {
                         switch (true) {
-                            case str_starts_with($arg, '-controller') | str_starts_with($arg, '--c'): // include controller
+                            case str_starts_with($arg, '--controller') | str_starts_with($arg, '-c'): // include controller
                                 if (substr_count($arg, '=') == 1) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
@@ -140,7 +148,7 @@ switch (strtolower($argv[1])) {
                                 }
                                 new Controller($argv[3].'Controller', $argv[3]);
                                 break;
-                            case str_starts_with($arg, '-table') | str_starts_with($arg, '--t'): // include table
+                            case str_starts_with($arg, '--table') | str_starts_with($arg, '-t'): // include table
                                 if (substr_count($arg, '=') == 1) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
@@ -149,10 +157,20 @@ switch (strtolower($argv[1])) {
                                     }
                                     break;
                                 }
+                            case str_starts_with($arg, '--with_policy') | str_starts_with($arg, '-wp'):
+                                if (substr_count($arg, '=') == 1) {
+                                    $arg = explode('=', $arg);
+                                    $arg = end($arg);
+                                } else {
+                                    $arg = $argv[3];
+                                }
+                                new Policy($arg);
                         }
                     }
                 }
-                new CreateModel($argv[3], $db);
+                new Model($argv[3], $db);
+            case 'policy':
+                new Policy($argv[3]);
         }
         break;
     case 'route':
