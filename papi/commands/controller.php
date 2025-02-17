@@ -19,8 +19,12 @@ class Controller
 
             $contents = file_get_contents("controllers/$name.php");
             $contents = str_replace('TempController', ucfirst($name), $contents);
+            if ($model != 'Auth') {
+                $contents = str_replace('use Papi\\', 'use Models\\', $contents);
+            } else {
+                $contents = str_replace('use Papi\Database', 'use Papi\\Auth\\Auth', $contents);
+            }
             $contents = str_replace('Database', $model, $contents);
-            $contents = str_replace('use Papi\\', 'use Models\\', $contents);
             file_put_contents("controllers/$name.php", $contents);
         }
     }

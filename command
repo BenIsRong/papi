@@ -3,7 +3,7 @@
 
 require_once './base.php';
 
-use Papi\Commands\Controller as CreateController;
+use Papi\Commands\Controller as Controller;
 use Papi\Commands\Model as CreateModel;
 use Papi\Commands\Setup;
 use Papi\Database as Database;
@@ -83,10 +83,11 @@ switch (strtolower($argv[1])) {
                 }
                 break;
             case 'controller': // create controller
+                $model = null;
                 $remArgs = array_slice($argv, 4);
                 if (count($remArgs) > 0) {
-                    $model = null;
                     foreach ($remArgs as $arg) {
+                        echo "arg: ". $arg;
                         switch (true) {
                             case str_starts_with($arg, '-model') | str_starts_with($arg, '--m'): // include model
                                 if (substr_count($arg, '=') == 1) {
@@ -97,6 +98,7 @@ switch (strtolower($argv[1])) {
                                         break;
                                     }
                                     $model = $arg;
+                                    echo $model;
                                 }
                                 $model = str_ends_with(strtolower($argv[3]), 'controller') ? substr($argv[3], 0, -10) : $argv[3];
                                 new CreateModel($model);
@@ -117,8 +119,9 @@ switch (strtolower($argv[1])) {
                                 break;
                         }
                     }
-                    new CreateController(str_ends_with(strtolower($argv[3]), 'controller') ? $argv[3] : $argv[3].'Controller', $model);
                 }
+                
+                new Controller(str_ends_with(strtolower($argv[3]), 'controller') ? $argv[3] : $argv[3].'Controller', $model);
                 break;
             case 'model': // create model
                 $db = null;
@@ -131,11 +134,11 @@ switch (strtolower($argv[1])) {
                                     $arg = explode('=', $arg);
                                     $arg = end($arg);
                                     if (strlen($arg) > 0) {
-                                        new CreateController($arg.'Controller', $arg);
+                                        new Controller($arg.'Controller', $arg);
                                         break;
                                     }
                                 }
-                                new CreateController($argv[3].'Controller', $argv[3]);
+                                new Controller($argv[3].'Controller', $argv[3]);
                                 break;
                             case str_starts_with($arg, '-table') | str_starts_with($arg, '--t'): // include table
                                 if (substr_count($arg, '=') == 1) {

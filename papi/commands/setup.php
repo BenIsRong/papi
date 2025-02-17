@@ -25,6 +25,8 @@ class Setup extends Auth
                     $this->createTable('roles', $tables['roles']['columns'], $tables['roles']['pk'], true, false, false);
                     $this->createTable('roles_with_permissions', $tables['roles_with_permissions']['columns'], '', true, false, false);
 
+                    new Controller('UserController', 'Auth');
+
                     unset($tables['users']);
                     unset($tables['tokens']);
                     unset($tables['permissions']);
