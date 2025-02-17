@@ -13,19 +13,26 @@ class Auth extends Database
      *
      * @return bool
      */
-    public function register(string $name, string $username, string $email, string $password, int $role)
+    public function register(array $request)
     {
-        if ($this->validateEmail($email) && $this->validatePassword($password)) {
-            return $this->insertInto($this->table, [
-                'name' => $name,
-                'username' => $username,
-                'email' => $email,
-                'password' => password_hash($password, PASSWORD_BCRYPT),
-                'role_id' => $role,
-            ], false);
-        } else {
-            return false;
+        if ($this->checkIfAllKeysExists(array_keys($request), ['name', 'username', 'email', 'password', 'role'])) {
+            if ($this->validateEmail($request['email']) && $this->validatePassword($request['password']) && ! $this->checkUserExists($request['email'], $request['password'])) {
+                $creatUserResult = $this->insertInto($this->table, [
+                    'name' => $request['name'],
+                    'username' => $request['username'],
+                    'email' => $request['email'],
+                    'password' => password_hash($request['password'], PASSWORD_BCRYPT),
+                    'role_id' => $request['role'],
+                ], false);
+                if ($creatUserResult) {
+                    return [
+                        'uuid' => $this->registerToken($request['email'], $request['password']),
+                    ];
+                }
+            }
         }
+
+        return false;
     }
 
     /**
@@ -136,11 +143,11 @@ class Auth extends Database
      */
     public function registerToken(string $email, string $password)
     {
-        $user = $this->viewOne($this->table, [
+        $user = $this->viewOne($this->table, [[
             'col' => 'email',
             'operator' => '=',
             'value' => $email,
-        ], false);
+        ]], false);
         if (password_verify($password, $user['password'])) {
             $id = $user['id'];
             $uuid = $this->uuid();
@@ -296,5 +303,27 @@ class Auth extends Database
         $token = end($token);
 
         return $token;
+    }
+
+    /**
+     * Check if user exists using email and password
+     *
+     * @return bool
+     */
+    public function checkUserExists(string $email, string $password)
+    {
+        $result = $this->viewOne($this->table, [
+            [
+                'col' => 'email',
+                'operator' => '=',
+                'value' => $email,
+            ],
+        ], false);
+
+        if ($result) {
+            return password_verify($password, $result['password']);
+        }
+
+        return false;
     }
 }

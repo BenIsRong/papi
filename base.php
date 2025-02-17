@@ -147,4 +147,16 @@ class Base extends Validation
         }
         file_put_contents($cachePath, gzcompress(json_encode($data)));
     }
+
+    public function checkIfAllKeysExists(array $keys, array $checks)
+    {
+        $notFound = [];
+        foreach ($checks as $check) {
+            if (! in_array($check, $keys)) {
+                array_push($notFound, $check);
+            }
+        }
+
+        return count($notFound) == 0 ? true : $notFound;
+    }
 }
