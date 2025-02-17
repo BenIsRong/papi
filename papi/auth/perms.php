@@ -11,10 +11,11 @@ class Perms extends Auth
      */
     public static function haveRole(string $token, string $role)
     {
-        $user = parent::getUserFromToken($token);
+        $auth = new Auth;
+        $user = $auth->getUserFromToken($token);
         if (! is_null($user)) {
             $userRole = $user['role_id'];
-            $res = parent::viewOne('roles', [
+            $res = $auth->viewOne('roles', [
                 [
                     'col' => 'id',
                     'operator' => '=',
@@ -39,16 +40,28 @@ class Perms extends Auth
      */
     public static function havePermission(string $token, string $permission)
     {
-        $user = parent::getUserFromToken($token);
+        $auth = new Auth;
+        $user = $auth->getUserFromToken($token);
 
         if (! is_null($user)) {
-            $permissions = parent::view('permissions', [
+            $permissionIds = $auth->view('roles_with_permissions', [
                 [
-                    'col' => 'id',
+                    'col' => 'role_id',
                     'operator' => '=',
                     'value' => $user['role_id'],
                 ],
-            ], false);
+            ]);
+            $permissions = [];
+
+            foreach ($permissionIds as $permissionId) {
+                array_push($permissions, $auth->viewOne('permissions', [
+                    [
+                        'col' => 'id',
+                        'operator' => '=',
+                        'value' => $permissionId['permission_id'],
+                    ],
+                ], false));
+            }
 
             $permissions = array_map(function ($permission) {
                 return strtolower($permission['name']);

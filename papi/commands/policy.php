@@ -12,12 +12,12 @@ class Policy extends Base
             mkdir('policies');
         }
 
-        if(!str_ends_with(strtolower($name), 'policy')){
-            $name = $name . 'Policy';
+        if (! str_ends_with(strtolower($name), 'policy')) {
+            $name = $name.'Policy';
         }
 
         if (file_exists("policies/$name.php")) {
-            echo "This policy already exists!";
+            echo 'This policy already exists!';
 
             return null;
         }
