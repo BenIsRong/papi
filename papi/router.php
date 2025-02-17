@@ -8,6 +8,11 @@ class Router extends Base
 
     private string $cachePath = __DIR__.'/cache/routes';
 
+    /**
+     * Construct the Router object
+     *
+     * @return object
+     */
     public function __construct()
     {
         if (file_exists($this->cachePath)) {
@@ -15,6 +20,11 @@ class Router extends Base
         }
     }
 
+    /**
+     * Add the route and path into the $routes, then to the cache
+     *
+     * @return void
+     */
     public function add(string $method, string $path, array $controller)
     {
         if (substr($path, -1) != '/') {
@@ -33,6 +43,11 @@ class Router extends Base
 
     }
 
+    /**
+     * Dispatches the route by calling the function based on route
+     *
+     * @return void
+     */
     public function dispatch(string $path)
     {
         if (substr($path, -1) != '/') {
@@ -64,6 +79,11 @@ class Router extends Base
         }
     }
 
+    /**
+     * Add the route and path into the $routes for the CRUD operations in a Controller, then to the cache
+     *
+     * @return void
+     */
     public function addCRUD(string $model, string $controller)
     {
         $cruds = [
@@ -96,6 +116,11 @@ class Router extends Base
         $this->addToCache($this->cachePath, $this->routes);
     }
 
+    /**
+     * List the routes that is stored in the cache
+     *
+     * @return void
+     */
     public function listRoutes()
     {
         echo 'The routes are: '."\n";

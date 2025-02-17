@@ -6,6 +6,11 @@ use Papi\Base;
 
 class Policy extends Base
 {
+    /**
+     * Construct a new Policy
+     *
+     * @return void
+     */
     public function __construct(string $name)
     {
         if (! is_dir('policies/')) {

@@ -166,6 +166,11 @@ class Database extends Base
         return $result;
     }
 
+    /**
+     * Get count in the table based on conditions
+     *
+     * @return int
+     */
     public function getCount(string $table, array $conditions = [], bool $checkToken = true, string $token = '')
     {
         $conn = $this->connectDatabase($checkToken, $token);
