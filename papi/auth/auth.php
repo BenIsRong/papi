@@ -36,6 +36,37 @@ class Auth extends Database
     }
 
     /**
+     * Login a user and return their token
+     *
+     * @return string|bool
+     */
+    public function login(array $request)
+    {
+        if ($this->checkIfAllKeysExists(array_keys($request), ['email|username', 'password'])) {
+            $identifier = in_array('email', array_keys($request)) ? 'email' : 'username';
+            if ($this->checkUserExists($request[$identifier], $request['password'])) {
+                $user = $this->viewOne($this->table, [[
+                    'col' => $identifier,
+                    'operator' => '=',
+                    'value' => $request[$identifier],
+                ]], false);
+
+                if (password_verify($request['password'], $user['password'])) {
+                    $token = $this->viewOne('tokens', [[
+                        'col' => 'user_id',
+                        'operator' => '=',
+                        'value' => $user['id'],
+                    ]], false);
+
+                    return $token['token'];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Update a user's name and username
      *
      * @return bool
@@ -280,13 +311,13 @@ class Auth extends Database
      *
      * @return bool
      */
-    public function checkUserExists(string $email, string $password)
+    public function checkUserExists(string $identifier, string $password)
     {
         $result = $this->viewOne($this->table, [
             [
-                'col' => 'email',
+                'col' => $this->validateEmail($identifier) ? 'email' : 'username',
                 'operator' => '=',
-                'value' => $email,
+                'value' => $identifier,
             ],
         ], false);
 

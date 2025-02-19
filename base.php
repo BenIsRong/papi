@@ -167,8 +167,26 @@ class Base extends Validation
     {
         $notFound = [];
         foreach ($checks as $check) {
-            if (! in_array($check, $keys)) {
-                array_push($notFound, $check);
+            switch (true) {
+                case str_contains($check, '|'):
+                    $checkParts = explode('|', $check);
+                    $partFound = false;
+                    foreach ($checkParts as $checkPart) {
+                        if (in_array($checkPart, $checks)) {
+                            $partFound = true;
+                            break;
+                        }
+                        break;
+                    }
+                    if (! $partFound) {
+                        array_push($notFound, $check);
+                    }
+                    break;
+                default:
+                    if (! in_array($check, $keys)) {
+                        array_push($notFound, $check);
+                    }
+                    break;
             }
         }
 
