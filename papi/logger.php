@@ -33,6 +33,66 @@ abstract class Logger extends Base
 {
     public static function logger($severity = LOG_SEV_INFORMATIONAL, string $msg = '', bool $client = false, bool $server = true)
     {
+        $datetime = new DateTime();
+        $datetime = $datetime->format('Y-m-d\TH:i:sp');
+        $log =
+        $log = [
+            "client_ip" => ($client ? $_SERVER['REMOTE_ADDR'] : ''),
+            "client_port" => ($client ? $_SERVER['REMOTE_PORT'] : ''),
+            "server_ip" => ($server ? $_SERVER['SERVER_ADDR'] : ''),
+            "server_port" => ($server ? $_SERVER['SERVER_PORT'] : ''),
+            "machine" => ($client ? $_SERVER['HTTP_USER_AGENT'] : ''),
+            "datetime" => $datetime,
+            "msg" => $msg,
+        ];
+
+        switch ($severity) {
+            case 0:
+                $log['severity'] = "EMERGENCY";
+                break;
+            case 1:
+                $log['severity'] = "ALERT";
+                break;
+            case 2:
+                $log['severity'] = "CRITICAL";
+                break;
+            case 3:
+                $log['severity'] = "ERROR";
+                break;
+            case 4:
+                $log['severity'] = "WARNING";
+                break;
+            case 5:
+                $log['severity'] = "NOTICE";
+                break;
+            case 6:
+                $log['severity'] = "INFORMATIONAL";
+                break;
+            case 7:
+                $log['severity'] = "DEBUG";
+                break;
+        }
+
+        $logType = parent::jsonToArray('config.json', 'log_type');
+
+        switch (strtolower(is_null($logType) ? 'csv' : $logType)) {
+            case 'csv':
+                self::toCSV($log);
+                break;
+            case 'json':
+                self::toJSON($log);
+                break;
+            case 'txt':
+                self::toTXT($log);
+                break;
+            default:
+                self::toCSV($log);
+                break;
+        }
+    }
+
+    private static function toCSV(array $log)
+    {
         if (!file_exists("log.csv")) {
             fopen("log.csv", 'a');
         }
@@ -41,48 +101,29 @@ abstract class Logger extends Base
             file_put_contents("log.csv", "severity,client_ip,client_port,server_ip,server_port,machine,datetime,msg\n", FILE_APPEND);
         }
 
-        $datetime = new DateTime();
-        $datetime = $datetime->format('Y-m-d\TH:i:sp');
-        $log =
-        $log = [
-            ($client ? $_SERVER['REMOTE_ADDR'] : ''),
-            ($client ? $_SERVER['REMOTE_PORT'] : ''),
-            ($server ? $_SERVER['SERVER_ADDR'] : ''),
-            ($server ? $_SERVER['SERVER_PORT'] : ''),
-            ($client ? $_SERVER['HTTP_USER_AGENT'] : ''),
-            $datetime,
-            $msg,
-        ];
-
-        switch ($severity) {
-            case 0:
-                array_unshift($log, "EMERGENCY");
-                break;
-            case 1:
-                array_unshift($log, "ALERT");
-                break;
-            case 2:
-                array_unshift($log, "CRITICAL");
-                break;
-            case 3:
-                array_unshift($log, "ERROR");
-                break;
-            case 4:
-                array_unshift($log, "WARNING");
-                break;
-            case 5:
-                array_unshift($log, "NOTICE");
-                break;
-            case 6:
-                array_unshift($log, "INFORMATIONAL");
-                break;
-            case 7:
-                array_unshift($log, "DEBUG");
-                break;
-        }
-
-        $log = implode(',', $log);
+        $log = implode(",", array_values($log));
 
         file_put_contents('log.csv', $log . "\n", FILE_APPEND);
+    }
+
+    private static function toJSON(array $log)
+    {
+        if (!file_exists("log.json")) {
+            fwrite(fopen("log.json", 'w'), json_encode([$log]));
+        } else {
+            $prevLogs = file_get_contents('log.json', true);
+            $prevLogs = json_decode($prevLogs, true);
+            array_push($prevLogs, $log);
+            fwrite(fopen("log.json", 'w'), json_encode($prevLogs));
+        }
+    }
+
+    private static function toTXT(array $log)
+    {
+        if (!file_exists("log.txt")) {
+            fopen("log.txt", 'a');
+        }
+
+        file_put_contents("log.txt", ("[" . $log['severity'] . "][" . $log['datetime'] . "](client => " . $log['client_ip'] . ":" . $log['client_port'] . ")[" . $log['machine'] ."](server => " . $log['server_ip'] . ":" . $log['server_port'] . "): " . $log['msg']) . "\n", FILE_APPEND);
     }
 }

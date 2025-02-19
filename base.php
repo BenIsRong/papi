@@ -16,7 +16,7 @@ class Base extends Validation
      *
      * @return mixed
      */
-    public function io(string $prompt, bool $yn = false, string $true = '')
+    public static function io(string $prompt, bool $yn = false, string $true = '')
     {
         $handler = fopen(STDIN, 'r');
         $answer = null;
@@ -43,7 +43,7 @@ class Base extends Validation
      *
      * @return void
      */
-    public function response($responseCode, $res = [])
+    public static function response($responseCode, $res = [])
     {
         if (! is_int($responseCode)) {
             $responseCode = $responseCode->get();
@@ -60,7 +60,7 @@ class Base extends Validation
      *
      * @return string
      */
-    public function uuid()
+    public static function uuid()
     {
         $data = random_bytes(16);
 
@@ -75,7 +75,7 @@ class Base extends Validation
      *
      * @return array|null
      */
-    public function jsonToArray(string $filepath, ?string $key = null)
+    public static function jsonToArray(string $filepath, ?string $key = null)
     {
         try {
             $jsonFile = json_decode(file_get_contents($filepath), true);
@@ -99,7 +99,7 @@ class Base extends Validation
      *
      * @return string
      */
-    public function pluralise(string $name, bool $lower = true)
+    public static function pluralise(string $name, bool $lower = true)
     {
         switch (true) {
             case str_ends_with($name, 'y'):
@@ -142,7 +142,7 @@ class Base extends Validation
      *
      * @return void
      */
-    public function addToCache($cachePath, $data)
+    public static function addToCache($cachePath, $data)
     {
         $dir = str_replace('\\', '/', $cachePath);
         $dir = explode('/', $dir);
@@ -163,7 +163,7 @@ class Base extends Validation
      *
      * @return bool|array
      */
-    public function checkIfAllKeysExists(array $keys, array $checks)
+    public static function checkIfAllKeysExists(array $keys, array $checks)
     {
         $notFound = [];
         foreach ($checks as $check) {
