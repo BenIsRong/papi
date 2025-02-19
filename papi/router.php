@@ -67,13 +67,13 @@ class Router extends Base
 
                 if ($implodePath == $implodeRoute && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                     [$class, $function] = $route['controller'];
-                    $controllerInstance = new $class;
+                    $controllerInstance = new $class();
                     $controllerInstance->$function($this->request(), $pathValue);
                 }
             }
             if ($path == $route['path'] && $route['method'] == strtoupper($_SERVER['REQUEST_METHOD'])) {
                 [$class, $function] = $route['controller'];
-                $controllerInstance = new $class;
+                $controllerInstance = new $class();
                 $controllerInstance->$function($this->request());
             }
         }
