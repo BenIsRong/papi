@@ -4,34 +4,34 @@ namespace Papi;
 
 use DateTime;
 
-if (!defined('LOG_EMERGENCY')) {
-    define('LOG_EMERGENCY', 0);
+if (!defined('LOG_SEV_EMERGENCY')) {
+    define('LOG_SEV_EMERGENCY', 0);
 }
-if (!defined('LOG_ALERT')) {
-    define('LOG_ALERT', 1);
+if (!defined('LOG_SEV_ALERT')) {
+    define('LOG_SEV_ALERT', 1);
 }
-if (!defined('LOG_CRITICAL')) {
-    define('LOG_CRITICAL', 2);
+if (!defined('LOG_SEV_CRITICAL')) {
+    define('LOG_SEV_CRITICAL', 2);
 }
-if (!defined('LOG_ERROR')) {
-    define('LOG_ERROR', 3);
+if (!defined('LOG_SEV_ERROR')) {
+    define('LOG_SEV_ERROR', 3);
 }
-if (!defined('LOG_WARNING')) {
-    define('LOG_WARNING', 4);
+if (!defined('LOG_SEV_WARNING')) {
+    define('LOG_SEV_WARNING', 4);
 }
-if (!defined('LOG_NOTICE')) {
-    define('LOG_NOTICE', 5);
+if (!defined('LOG_SEV_NOTICE')) {
+    define('LOG_SEV_NOTICE', 5);
 }
-if (!defined('LOG_INFORMATIONAL')) {
-    define('LOG_INFORMATIONAL', 6);
+if (!defined('LOG_SEV_INFORMATIONAL')) {
+    define('LOG_SEV_INFORMATIONAL', 6);
 }
-if (!defined('LOG_DEBUG')) {
-    define('LOG_DEBUG', 7);
+if (!defined('LOG_SEV_DEBUG')) {
+    define('LOG_SEV_DEBUG', 7);
 }
 
 abstract class Logger extends Base
 {
-    public static function logger($severity = LOG_INFORMATIONAL, string $msg = '', bool $client = false, bool $server = true)
+    public static function logger($severity = LOG_SEV_INFORMATIONAL, string $msg = '', bool $client = false, bool $server = true)
     {
         if (!file_exists("log.csv")) {
             fopen("log.csv", 'a');
