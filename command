@@ -4,6 +4,7 @@
 require_once './base.php';
 
 use Papi\Commands\Controller;
+use Papi\Commands\Event;
 use Papi\Commands\Model;
 use Papi\Commands\Policy;
 use Papi\Commands\Setup;
@@ -171,6 +172,14 @@ switch (strtolower($argv[1])) {
                 new Model($argv[3], $db);
             case 'policy':
                 new Policy($argv[3]);
+                break;
+            case 'event':
+                if(str_contains(strtolower($argv[3]), 'event')){
+                    new Event(str_ireplace("event", "", $argv[3]));
+                }else{
+                    new Event($argv[3]);
+                }
+                break;
         }
         break;
     case 'route':

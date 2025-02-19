@@ -1,0 +1,72 @@
+<?php
+
+namespace Events;
+
+abstract class TempEvent
+{
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function createRecord(string $model, string $function)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function readRecord(string $model, string $function)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function readAllRecords(string $model, string $function)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function updateRecord(string $model, string $function)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function deleteRecord(string $model, string $function)
+    {
+        // your code goes here
+    }
+
+    /**
+     * This function is for you to set a trigger for your event
+     * in TempController
+     *
+     * @return void
+     */
+    public static function clearAll(string $model, string $function)
+    {
+        // your code goes here
+    }
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace Papi;
+namespace Papi\Traits;
 
 use Exception;
 

@@ -10,3 +10,4 @@ cache/
 policies/
 pint.json
 log.csv
+events/
