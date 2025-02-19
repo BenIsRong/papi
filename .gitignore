@@ -9,3 +9,4 @@ papi/resources/models.json
 cache/
 policies/
 pint.json
+log.csv
