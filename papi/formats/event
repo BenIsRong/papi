@@ -10,7 +10,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function createRecord(string $model, string $function, string $callFunction)
+    public static function createRecordLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }
@@ -21,7 +21,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function readRecord(string $model, string $function, string $callFunction)
+    public static function readRecordLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }
@@ -32,7 +32,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function readAllRecords(string $model, string $function, string $callFunction)
+    public static function readAllRecordsLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }
@@ -43,7 +43,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function updateRecord(string $model, string $function, string $callFunction)
+    public static function updateRecordLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }
@@ -54,7 +54,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function deleteRecord(string $model, string $function, string $callFunction)
+    public static function deleteRecordLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }
@@ -65,7 +65,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function clearAll(string $model, string $function, string $callFunction)
+    public static function clearAllLOG_SEV_(string $model, string $function, string $callFunction, $callback)
     {
         // your code goes here
     }

@@ -4,7 +4,7 @@ namespace Papi\Traits;
 
 trait Listenable
 {
-    public function listen()
+    public function listen($callback = null)
     {
         $function = debug_backtrace()[1]['function'];
         $model = explode("\\", debug_backtrace()[1]['class']);
@@ -12,10 +12,10 @@ trait Listenable
         $model = str_replace("Controller", "", $model);
         $event = "\\events\\" . $model . "Event";
 
-        $event::$function($model, $function, $function);
+        $event::$function(model: $model, function: $function, callFunction: $function, callback: $callback);
     }
 
-    public function triggers(string $model, string $function = "")
+    public function triggers(string $model, string $function = "", $callback = null)
     {
         $callFunction = debug_backtrace()[1]['function'];
         if ($function == "") {
@@ -26,6 +26,6 @@ trait Listenable
         $model = end($model);
         $event = "\\events\\" . $model . "Event";
 
-        $event::$function($model, $function, $callFunction);
+        $event::$function(model: $model, function: $function, callFunction: $function, callback: $callback);
     }
 }
