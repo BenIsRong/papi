@@ -42,7 +42,7 @@ abstract class Logger extends Base
         }
 
         $datetime = new DateTime();
-        $datetime = $datetime->format('Y-m-dTH:i:sp');
+        $datetime = $datetime->format('Y-m-d\TH:i:sp');
         $log =
         $log = [
             ($client ? $_SERVER['REMOTE_ADDR'] : ''),
@@ -53,33 +53,36 @@ abstract class Logger extends Base
             $datetime,
             $msg,
         ];
+
         switch ($severity) {
-            case LOG_EMERGENCY:
+            case 0:
                 array_unshift($log, "EMERGENCY");
                 break;
-            case LOG_ALERT:
+            case 1:
                 array_unshift($log, "ALERT");
                 break;
-            case LOG_CRITICAL:
+            case 2:
                 array_unshift($log, "CRITICAL");
                 break;
-            case LOG_ERROR:
+            case 3:
                 array_unshift($log, "ERROR");
                 break;
-            case LOG_WARNING:
+            case 4:
                 array_unshift($log, "WARNING");
                 break;
-            case LOG_NOTICE:
+            case 5:
                 array_unshift($log, "NOTICE");
                 break;
-            case LOG_INFORMATIONAL:
+            case 6:
                 array_unshift($log, "INFORMATIONAL");
                 break;
-            case LOG_DEBUG:
+            case 7:
                 array_unshift($log, "DEBUG");
                 break;
         }
 
-        file_put_contents('log.csv', implode(',', $log) . "\n", FILE_APPEND);
+        $log = implode(',', $log);
+
+        file_put_contents('log.csv', $log . "\n", FILE_APPEND);
     }
 }
