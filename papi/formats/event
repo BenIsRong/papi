@@ -10,7 +10,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function createRecord(string $model, string $function)
+    public static function createRecord(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
@@ -21,7 +21,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function readRecord(string $model, string $function)
+    public static function readRecord(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
@@ -32,7 +32,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function readAllRecords(string $model, string $function)
+    public static function readAllRecords(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
@@ -43,7 +43,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function updateRecord(string $model, string $function)
+    public static function updateRecord(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
@@ -54,7 +54,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function deleteRecord(string $model, string $function)
+    public static function deleteRecord(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
@@ -65,7 +65,7 @@ abstract class TempEvent
      *
      * @return void
      */
-    public static function clearAll(string $model, string $function)
+    public static function clearAll(string $model, string $function, string $callFunction)
     {
         // your code goes here
     }
