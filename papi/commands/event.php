@@ -17,12 +17,12 @@ class Event extends Database
             mkdir('events');
         }
 
-        copy('papi/formats/event', "events/$model" . "Event" . ".php");
+        copy('papi/formats/event', "events/$model".'Event'.'.php');
 
-        $contents = file_get_contents("events/$model" . "Event" . ".php");
-        $contents = str_replace('TempEvent', $model . "Event", $contents);
-        $contents = str_replace('TempController', $model . "Controller", $contents);
+        $contents = file_get_contents("events/$model".'Event'.'.php');
+        $contents = str_replace('TempEvent', $model.'Event', $contents);
+        $contents = str_replace('TempController', $model.'Controller', $contents);
 
-        file_put_contents("events/$model" . "Event" . ".php", $contents);
+        file_put_contents("events/$model".'Event'.'.php', $contents);
     }
 }

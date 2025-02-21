@@ -106,7 +106,7 @@ abstract class BaseModel extends Database
     {
         $this->checkTable();
         if ($this->softDelete) {
-            return $this->updateInto($this->table, ['deleted_at' => new DateTime()], $conditions, $checkToken);
+            return $this->updateInto($this->table, ['deleted_at' => new DateTime], $conditions, $checkToken);
         } else {
             return $this->deleteFrom($this->table, $conditions, $checkToken);
         }

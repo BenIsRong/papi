@@ -208,5 +208,6 @@
             }
         }
     ],
-    "log_type": "csv"
+    "log_type": "csv",
+    "db": "mysql"
 }

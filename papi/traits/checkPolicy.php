@@ -20,7 +20,7 @@ trait CheckPolicy
         $headers = apache_request_headers();
         $token = explode(' ', $headers['Authorization']);
         $token = end($token);
-        $policy = new $policy();
+        $policy = new $policy;
         if ($policy->{$function}($token)) {
             return true;
         } else {

@@ -11,7 +11,7 @@ class Perms extends Auth
      */
     public static function haveRole(string $token, string $role)
     {
-        $auth = new Auth();
+        $auth = new Auth;
         $user = $auth->getUserFromToken($token);
         if (! is_null($user)) {
             $userRole = $user['role_id'];
@@ -40,7 +40,7 @@ class Perms extends Auth
      */
     public static function havePermission(string $token, string $permission)
     {
-        $auth = new Auth();
+        $auth = new Auth;
         $user = $auth->getUserFromToken($token);
 
         if (! is_null($user)) {
