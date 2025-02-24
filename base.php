@@ -18,7 +18,7 @@ class Base extends Validation
      */
     public static function io(string $prompt, bool $yn = false, string $true = '')
     {
-        $handler = fopen(STDIN, 'r');
+        $handler = fopen("php://stdin", 'r');
         $answer = null;
 
         while ($answer == '' || is_null($answer)) {
