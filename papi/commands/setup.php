@@ -47,7 +47,12 @@ class Setup extends Auth
                         do {
                             $password = $this->io('Password');
                         } while (! $this->validatePassword($password));
-                        $this->register($name, $username, $email, $password, $adminRoleId);
+                        $this->register(["name" => $name,
+                                         "username" => $username,
+                                         "email" => $email,
+                                         "password" => $password,
+                                         "role" => $adminRoleId
+                        ]);
                         $uuid = $this->registerToken($email, $password);
                         echo 'User created with token '.$uuid;
                         echo "\nPlease keep this token carefully as this is how you interact with your API!";

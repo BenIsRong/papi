@@ -10,14 +10,14 @@ use Papi\Commands\Policy;
 use Papi\Commands\Setup;
 use Papi\Database as Database;
 
-$db = new Database;
+$db = new Database();
 
 switch (strtolower($argv[1])) {
     case 'dev':
         exec('php -S localhost:8000 index.php');
         break;
     case 'init': // init
-        new Setup;
+        new Setup();
         break;
     case 'create': // create
         switch (strtolower($argv[2])) {
@@ -158,6 +158,7 @@ switch (strtolower($argv[1])) {
                                     }
                                     break;
                                 }
+                                // no break
                             case str_starts_with($arg, '--with_policy') | str_starts_with($arg, '-wp'):
                                 if (substr_count($arg, '=') == 1) {
                                     $arg = explode('=', $arg);
@@ -170,13 +171,14 @@ switch (strtolower($argv[1])) {
                     }
                 }
                 new Model($argv[3], $db);
+                // no break
             case 'policy':
                 new Policy($argv[3]);
                 break;
             case 'event':
-                if(str_contains(strtolower($argv[3]), 'event')){
+                if (str_contains(strtolower($argv[3]), 'event')) {
                     new Event(str_ireplace("event", "", $argv[3]));
-                }else{
+                } else {
                     new Event($argv[3]);
                 }
                 break;
